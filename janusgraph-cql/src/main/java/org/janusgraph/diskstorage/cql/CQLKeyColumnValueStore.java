@@ -133,6 +133,7 @@ public class CQLKeyColumnValueStore implements KeyColumnValueStore {
     private final CQLColValGetter getter;
     private final Runnable closer;
 
+    //CQL操作语句
     private final PreparedStatement getSlice;
     private final PreparedStatement getKeysAll;
     private final PreparedStatement getKeysRanged;

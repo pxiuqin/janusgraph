@@ -58,9 +58,9 @@ public class CqlBinaryRecordReader extends RecordReader<StaticBuffer, Iterable<E
                 incompleteKV = null;
             } else {
                 Row row = reader.getCurrentValue();
-                StaticArrayBuffer key = StaticArrayBuffer.of(row.getBytesUnsafe(CQLKeyColumnValueStore.KEY_COLUMN_NAME));
-                StaticBuffer column1 = StaticArrayBuffer.of(row.getBytesUnsafe(CQLKeyColumnValueStore.COLUMN_COLUMN_NAME));
-                StaticBuffer value = StaticArrayBuffer.of(row.getBytesUnsafe(CQLKeyColumnValueStore.VALUE_COLUMN_NAME));
+                StaticArrayBuffer key = StaticArrayBuffer.of(row.getBytesUnsafe(CQLKeyColumnValueStore.KEY_COLUMN_NAME));  //获取Key
+                StaticBuffer column1 = StaticArrayBuffer.of(row.getBytesUnsafe(CQLKeyColumnValueStore.COLUMN_COLUMN_NAME)); //获取Column
+                StaticBuffer value = StaticArrayBuffer.of(row.getBytesUnsafe(CQLKeyColumnValueStore.VALUE_COLUMN_NAME));  //获取Value
                 Entry entry = StaticArrayEntry.of(column1, value);
 
                 if (null == incompleteKV) {

@@ -21,7 +21,7 @@ import org.janusgraph.graphdb.configuration.GraphDatabaseConfiguration;
 import org.janusgraph.graphdb.configuration.PreInitializeConfigOptions;
 
 /**
- * Configuration options for the CQL storage backend. These are managed under the 'cql' namespace in the configuration.
+ * Configuration options for the CQL storage backend. These are managed under the 'cql' namespace in the configuration.【基于CQL的配置情况】
  */
 @PreInitializeConfigOptions
 public interface CQLConfigOptions {

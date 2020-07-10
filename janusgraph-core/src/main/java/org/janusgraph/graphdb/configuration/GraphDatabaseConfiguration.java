@@ -65,7 +65,7 @@ import org.janusgraph.graphdb.transaction.StandardTransactionBuilder;
 import org.janusgraph.util.stats.MetricManager;
 
 /**
- * Provides functionality to configure a {@link org.janusgraph.core.JanusGraph} INSTANCE.
+ * Provides functionality to configure a {@link org.janusgraph.core.JanusGraph} INSTANCE.【图模式支持存储配置】
  * <p>
  * <p>
  * A graph database configuration is uniquely associated with a graph database and must not be used for multiple

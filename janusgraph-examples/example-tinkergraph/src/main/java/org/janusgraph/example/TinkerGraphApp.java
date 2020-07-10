@@ -24,7 +24,7 @@ public class TinkerGraphApp extends GraphApp {
 
     /**
      * Constructs a graph app using the given properties.
-     * @param fileName location of the properties file
+     * @param fileName location of the properties file  【图配置文件】
      */
     public TinkerGraphApp(final String fileName) {
         super(fileName);
@@ -44,7 +44,7 @@ public class TinkerGraphApp extends GraphApp {
     }
 
     public static void main(String[] args) {
-        final String fileName = (args != null && args.length > 0) ? args[0] : null;
+        final String fileName = (args != null && args.length > 0) ? args[0] : "conf/jgex-tinkergraph.properties";
         final TinkerGraphApp app = new TinkerGraphApp(fileName);
         app.runApp();
     }

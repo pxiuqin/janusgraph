@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * Interface to a data store that has a BigTable like representation of its data. In other words, the data store is comprised of a set of rows
  * each of which is uniquely identified by a key. Each row is composed of a column-value pairs. For a given key, a subset of the column-value
- * pairs that fall within a column interval can be quickly retrieved.
+ * pairs that fall within a column interval can be quickly retrieved.【使用WideRow存储方式转换的接口】
  * <p>
  * This interface provides methods for retrieving and mutating the data.
  * <p>

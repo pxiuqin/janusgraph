@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>janusgraph-cql</artifactId>
-    <name>JanusGraph-CQL: Distributed Graph Database</name>
+    <name>JanusGraph-CQL: Distributed Graph Database[基于Cassandra的查询语言CQL]</name>
     <url>https://janusgraph.org</url>
 
     <properties>

@@ -30,6 +30,7 @@ import org.janusgraph.core.attribute.Geoshape;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+//构建一个图
 public class GraphApp {
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphApp.class);
 
@@ -56,8 +57,8 @@ public class GraphApp {
     public GraphTraversalSource openGraph() throws ConfigurationException {
         LOGGER.info("opening graph");
         conf = new PropertiesConfiguration(propFileName);
-        graph = GraphFactory.open(conf);
-        g = graph.traversal();
+        graph = GraphFactory.open(conf);  //基于配置文件构建图
+        g = graph.traversal();  //构建遍历图
         return g;
     }
 
@@ -107,7 +108,7 @@ public class GraphApp {
 
             // see GraphOfTheGodsFactory.java
 
-            final Vertex saturn = g.addV("titan").property("name", "saturn").property("age", 10000).next();
+            final Vertex saturn = g.addV("titan").property("name", "saturn").property("age", 10000).next();  //添加label，然后添加相关属性
             final Vertex sky = g.addV("location").property("name", "sky").next();
             final Vertex sea = g.addV("location").property("name", "sea").next();
             final Vertex jupiter = g.addV("god").property("name", "jupiter").property("age", 5000).next();
@@ -120,6 +121,7 @@ public class GraphApp {
             final Vertex cerberus = g.addV("monster").property("name", "cerberus").next();
             final Vertex tartarus = g.addV("location").property("name", "tartarus").next();
 
+            //添加边
             g.V(jupiter).as("a").V(saturn).addE("father").from("a").next();
             g.V(jupiter).as("a").V(sky).addE("lives").property("reason", "loves fresh breezes").from("a").next();
             g.V(jupiter).as("a").V(neptune).addE("brother").from("a").next();
