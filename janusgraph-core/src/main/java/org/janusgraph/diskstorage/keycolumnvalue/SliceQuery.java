@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Queries for a slice of data identified by a start point (inclusive) and end point (exclusive).
+ * Queries for a slice of data identified by a start point (inclusive) and end point (exclusive).  【包含开始节点，不包含结束节点】
  * Returns all {@link StaticBuffer}s that lie in this range up to the given limit.
  * <p>
  * If a SliceQuery is marked <i>static</i> it is expected that the result set does not change.
@@ -40,8 +40,8 @@ import java.util.Objects;
 
 public class SliceQuery extends BaseQuery implements BackendQuery<SliceQuery> {
 
-    private final StaticBuffer sliceStart;
-    private final StaticBuffer sliceEnd;
+    private final StaticBuffer sliceStart; //开始Point
+    private final StaticBuffer sliceEnd;  //结束Point
 
     public SliceQuery(final StaticBuffer sliceStart, final StaticBuffer sliceEnd) {
         assert sliceStart != null && sliceEnd != null;
@@ -87,6 +87,8 @@ public class SliceQuery extends BaseQuery implements BackendQuery<SliceQuery> {
             return false;
 
         SliceQuery oth = (SliceQuery) other;
+
+        //比较下其中的三个属性
         return sliceStart.equals(oth.sliceStart)
                 && sliceEnd.equals(oth.sliceEnd)
                 && getLimit() == oth.getLimit();
@@ -105,7 +107,7 @@ public class SliceQuery extends BaseQuery implements BackendQuery<SliceQuery> {
     //TODO: make this more efficient by using reuseIterator() on otherResult
     public EntryList getSubset(final SliceQuery otherQuery, final EntryList otherResult) {
         assert otherQuery.subsumes(this);
-        int pos = Collections.binarySearch(otherResult, sliceStart);
+        int pos = Collections.binarySearch(otherResult, sliceStart);  //找到起始位置
         if (pos < 0) pos = -pos - 1;
 
         final List<Entry> result = new ArrayList<>();

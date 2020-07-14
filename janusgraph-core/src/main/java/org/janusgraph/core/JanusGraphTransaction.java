@@ -74,9 +74,9 @@ public interface JanusGraphTransaction extends Transaction {
     JanusGraphVertex getVertex(long id);
 
 
-    Iterable<JanusGraphVertex> getVertices(long... ids);
+    Iterable<JanusGraphVertex> getVertices(long... ids);  //获取节点
 
-    Iterable<JanusGraphEdge> getEdges(RelationIdentifier... ids);
+    Iterable<JanusGraphEdge> getEdges(RelationIdentifier... ids);  //获取边
 
    /* ---------------------------------------------------------------
     * Closing and admin

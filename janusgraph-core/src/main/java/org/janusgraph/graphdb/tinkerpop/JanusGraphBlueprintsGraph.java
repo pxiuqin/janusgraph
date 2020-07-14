@@ -66,7 +66,7 @@ public abstract class JanusGraphBlueprintsGraph implements JanusGraph {
 
     // ########## TRANSACTION HANDLING ###########################
 
-    final GraphTransaction tinkerpopTxContainer = new GraphTransaction();
+    final GraphTransaction tinkerpopTxContainer = new GraphTransaction();  //提供给gremlin执行时拿到事务
 
     private ThreadLocal<JanusGraphBlueprintsTransaction> txs = ThreadLocal.withInitial(() -> null);
 
@@ -280,7 +280,7 @@ public abstract class JanusGraphBlueprintsGraph implements JanusGraph {
     }
 
 
-
+    //继承Gremlin线程处理的事务
     class GraphTransaction extends AbstractThreadLocalTransaction {
 
         public GraphTransaction() {

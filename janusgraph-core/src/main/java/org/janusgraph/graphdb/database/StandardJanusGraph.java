@@ -541,6 +541,7 @@ public class StandardJanusGraph extends JanusGraphBlueprintsGraph {
         }
     }
 
+    //准备提交数据，基于添加关系和删除关系
     public ModificationSummary prepareCommit(final Collection<InternalRelation> addedRelations,
                                      final Collection<InternalRelation> deletedRelations,
                                      final Predicate<InternalRelation> filter,
@@ -548,17 +549,17 @@ public class StandardJanusGraph extends JanusGraphBlueprintsGraph {
                                      final boolean acquireLocks) throws BackendException {
 
 
-        ListMultimap<Long, InternalRelation> mutations = ArrayListMultimap.create();
-        ListMultimap<InternalVertex, InternalRelation> mutatedProperties = ArrayListMultimap.create();
-        List<IndexSerializer.IndexUpdate> indexUpdates = Lists.newArrayList();
-        //1) Collect deleted edges and their index updates and acquire edge locks
+        ListMultimap<Long, InternalRelation> mutations = ArrayListMultimap.create(); //保存所有变化的Relation
+        ListMultimap<InternalVertex, InternalRelation> mutatedProperties = ArrayListMultimap.create();  //变化的属性存储
+        List<IndexSerializer.IndexUpdate> indexUpdates = Lists.newArrayList();  //所有索引的更新
+        //1) Collect deleted edges and their index updates and acquire edge locks【处理删除关系的处理】
         for (InternalRelation del : Iterables.filter(deletedRelations,filter)) {
             Preconditions.checkArgument(del.isRemoved());
             for (int pos = 0; pos < del.getLen(); pos++) {
-                InternalVertex vertex = del.getVertex(pos);
+                InternalVertex vertex = del.getVertex(pos);  //获取节点ID
                 if (pos == 0 || !del.isLoop()) {
                     if (del.isProperty()) mutatedProperties.put(vertex,del);
-                    mutations.put(vertex.longId(), del);
+                    mutations.put(vertex.longId(), del);  //记录下相关情况
                 }
                 if (acquireLock(del,pos,acquireLocks)) {
                     Entry entry = edgeSerializer.writeRelation(del, pos, tx);
@@ -568,25 +569,29 @@ public class StandardJanusGraph extends JanusGraphBlueprintsGraph {
             indexUpdates.addAll(indexSerializer.getIndexUpdates(del));
         }
 
-        //2) Collect added edges and their index updates and acquire edge locks
+        //2) Collect added edges and their index updates and acquire edge locks【处理添加关系的处理】
         for (InternalRelation add : Iterables.filter(addedRelations,filter)) {
             Preconditions.checkArgument(add.isNew());
-
             for (int pos = 0; pos < add.getLen(); pos++) {
-                InternalVertex vertex = add.getVertex(pos);
+                InternalVertex vertex = add.getVertex(pos);  //vertex拿到的就是这个InternalRelation中涉及的节点
+                //如果pos==0 且没有循环，才将这个节点放到变化集合和属性变化集合中
                 if (pos == 0 || !add.isLoop()) {
+                    //isProperty为true,加入到属性集合中
                     if (add.isProperty()) mutatedProperties.put(vertex,add);
                     mutations.put(vertex.longId(), add);
                 }
+                // vertex.isNew==true 节点是新增的
                 if (!vertex.isNew() && acquireLock(add,pos,acquireLocks)) {
                     Entry entry = edgeSerializer.writeRelation(add, pos, tx);
                     mutator.acquireEdgeLock(idManager.getKey(vertex.longId()), entry.getColumn());
                 }
             }
+            //没有涉及索引
             indexUpdates.addAll(indexSerializer.getIndexUpdates(add));
         }
 
-        //3) Collect all index update for vertices
+        //3) Collect all index update for vertices【处理索引集合】
+        // 看完addRelations中的InternalRelation中的索引后再看下属性更新集合中的key也就是InternalVertex是否涉及索引
         for (InternalVertex v : mutatedProperties.keySet()) {
             indexUpdates.addAll(indexSerializer.getIndexUpdates(v,mutatedProperties.get(v)));
         }
@@ -609,29 +614,40 @@ public class StandardJanusGraph extends JanusGraphBlueprintsGraph {
         //5) Add relation mutations
         for (Long vertexId : mutations.keySet()) {
             Preconditions.checkArgument(vertexId > 0, "Vertex has no id: %s", vertexId);
-            final List<InternalRelation> edges = mutations.get(vertexId);
-            final List<Entry> additions = new ArrayList<>(edges.size());
-            final List<Entry> deletions = new ArrayList<>(Math.max(10, edges.size() / 10));
+            // 获取vertex对应的InternalRelation此处仍然是那两个
+            final List<InternalRelation> edges = mutations.get(vertexId);  //关系构建
+            // 增加的Entry列表和删除的Entry列表，这里Entry应为cassandra的存储模型，至于ArrayList的大小，应该是数学推导出来的吧，先往下看
+            final List<Entry> additions = new ArrayList<>(edges.size());  //关系的添加情况
+            final List<Entry> deletions = new ArrayList<>(Math.max(10, edges.size() / 10));  //关系的删除
+
+            //迭代处理关系
             for (final InternalRelation edge : edges) {
-                final InternalRelationType baseType = (InternalRelationType) edge.getType();
+                // 第一个InternalRelation edge为表示节点v存在的属性模型，实例为StandardVertexProperty，取出的InternalRelationType baseType实现为BaseKey
+                final InternalRelationType baseType = (InternalRelationType) edge.getType();  //分类型来弄
                 assert baseType.getBaseType()==null;
 
+                //遍历类型
                 for (InternalRelationType type : baseType.getRelationIndexes()) {
+                    //调用到了EmptyRelationType抽象类中实现的getRelationIndexex()方法，取到的仍然是BaseKey本身，getRelationIndexes具体获得的是什么待研究
                     if (type.getStatus()== SchemaStatus.DISABLED) continue;
-                    for (int pos = 0; pos < edge.getArity(); pos++) {
+                    // edge若继承自AbstractEdge arity=2 若继承自AbstractVertexPropery arity = 1, BaseKey arity = 1，此处arity表示的是这个InternalRelationType涉及几个节点，源码解析见下文
+                    for (int pos = 0; pos < edge.getArity(); pos++) {  //关系的节点数
+                        // type.isUnidirected在BaseKey中的实现见下文，即传入的方向如果是OUT即视为单向
                         if (!type.isUnidirected(Direction.BOTH) && !type.isUnidirected(EdgeDirection.fromPosition(pos)))
                             continue; //Directionality is not covered
                         if (edge.getVertex(pos).longId()==vertexId) {
-                            StaticArrayEntry entry = edgeSerializer.writeRelation(edge, type, pos, tx);
+                            // 序列化后应该就是存入cassandra中的数据，这个方法深入看下，源码解析见下文，传入的当前的InternalRelation和InternalRelationType以及对应节点的位置和StandardJanusGraphTx对象
+                            StaticArrayEntry entry = edgeSerializer.writeRelation(edge, type, pos, tx);  //写入关系
+                            // entry已经拿到了，buffer里面就是以上分析中写的一些序列化的数据
                             if (edge.isRemoved()) {
-                                deletions.add(entry);
+                                deletions.add(entry);  //删除
                             } else {
                                 Preconditions.checkArgument(edge.isNew());
                                 int ttl = getTTL(edge);
                                 if (ttl > 0) {
                                     entry.setMetaData(EntryMetaData.TTL, ttl);
                                 }
-                                additions.add(entry);
+                                additions.add(entry);   //添加
                             }
                         }
                     }
@@ -639,6 +655,7 @@ public class StandardJanusGraph extends JanusGraphBlueprintsGraph {
             }
 
             StaticBuffer vertexKey = idManager.getKey(vertexId);
+            //序列化完成后，接下来要跟具体存储处理，比如：cassandra，实际上做的事就是把之前序列化的结果放到mutator中转换成cassandra的数据结构
             mutator.mutateEdges(vertexKey, additions, deletions);
         }
 
@@ -673,24 +690,25 @@ public class StandardJanusGraph extends JanusGraphBlueprintsGraph {
 
     private static final Predicate<InternalRelation> NO_FILTER = Predicates.alwaysTrue();
 
+    //对添加和删除操作进行commit
     public void commit(final Collection<InternalRelation> addedRelations,
                      final Collection<InternalRelation> deletedRelations, final StandardJanusGraphTx tx) {
         if (addedRelations.isEmpty() && deletedRelations.isEmpty()) return;
         //1. Finalize transaction
         log.debug("Saving transaction. Added {}, removed {}", addedRelations.size(), deletedRelations.size());
-        if (!tx.getConfiguration().hasCommitTime()) tx.getConfiguration().setCommitTime(times.getTime());
+        if (!tx.getConfiguration().hasCommitTime()) tx.getConfiguration().setCommitTime(times.getTime());  //没有提交时间的设置相关时间
         final Instant txTimestamp = tx.getConfiguration().getCommitTime();
         final long transactionId = txCounter.incrementAndGet();
 
-        //2. Assign JanusGraphVertex IDs
+        //2. Assign JanusGraphVertex IDs【根据配置是否自动分配ID】
         if (!tx.getConfiguration().hasAssignIDsImmediately())
             idAssigner.assignIDs(addedRelations);
 
         //3. Commit
         BackendTransaction mutator = tx.getTxHandle();
-        final boolean acquireLocks = tx.getConfiguration().hasAcquireLocks();
-        final boolean hasTxIsolation = backend.getStoreFeatures().hasTxIsolation();
-        final boolean logTransaction = config.hasLogTransactions() && !tx.getConfiguration().hasEnabledBatchLoading();
+        final boolean acquireLocks = tx.getConfiguration().hasAcquireLocks();  //是否获得锁
+        final boolean hasTxIsolation = backend.getStoreFeatures().hasTxIsolation();  //隔离性的体现，如果是cassandra保证最终一致性这里就是false
+        final boolean logTransaction = config.hasLogTransactions() && !tx.getConfiguration().hasEnabledBatchLoading();  //日志事务，这里如果是批处理就不进行日志事务
         final KCVSLog txLog = logTransaction?backend.getSystemTxLog():null;
         final TransactionLogHeader txLogHeader = new TransactionLogHeader(transactionId,txTimestamp, times);
         ModificationSummary commitSummary;
@@ -707,7 +725,9 @@ public class StandardJanusGraph extends JanusGraphBlueprintsGraph {
             //3.2 Commit schema elements and their associated relations in a separate transaction if backend does not support
             //    transactional isolation
             boolean hasSchemaElements = !Iterables.isEmpty(Iterables.filter(deletedRelations,SCHEMA_FILTER))
-                    || !Iterables.isEmpty(Iterables.filter(addedRelations,SCHEMA_FILTER));
+                    || !Iterables.isEmpty(Iterables.filter(addedRelations,SCHEMA_FILTER));  //是否修改了schema
+
+            //如果需要修改Schema并且开启了batch loading模式，且没有拿到锁，就抛异常，在batch loading 模式修改schema必须获得锁
             Preconditions.checkArgument(!hasSchemaElements || (!tx.getConfiguration().hasEnabledBatchLoading() && acquireLocks),
                     "Attempting to create schema elements in inconsistent state");
 
@@ -723,7 +743,7 @@ public class StandardJanusGraph extends JanusGraphBlueprintsGraph {
 
                 try {
                     //[FAILURE] If the preparation throws an exception abort directly - nothing persisted since batch-loading cannot be enabled for schema elements
-                    commitSummary = prepareCommit(addedRelations,deletedRelations, SCHEMA_FILTER, schemaMutator, tx, acquireLocks);
+                    commitSummary = prepareCommit(addedRelations,deletedRelations, SCHEMA_FILTER, schemaMutator, tx, acquireLocks);  //
                     assert commitSummary.hasModifications && !commitSummary.has2iModifications;
                 } catch (Throwable e) {
                     //Roll back schema tx and escalate exception

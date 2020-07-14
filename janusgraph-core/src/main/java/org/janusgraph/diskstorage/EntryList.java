@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * 【构建一个数据】
  * @author Matthias Broecheler (me@matthiasb.com)
  */
 public interface EntryList extends List<Entry> {

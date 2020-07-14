@@ -123,6 +123,7 @@ public abstract class JanusGraphBlueprintsTransaction implements JanusGraphTrans
         return vertex;
     }
 
+    //基于给定Id获取相关节点
     @Override
     public Iterator<Vertex> vertices(Object... vertexIds) {
         if (vertexIds==null || vertexIds.length==0) return (Iterator)getVertices().iterator();

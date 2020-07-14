@@ -64,17 +64,18 @@ public class CacheTransaction implements StoreTransaction, LoggableTransaction {
         return tx;
     }
 
+    //转换操作
     void mutate(KCVSCache store, StaticBuffer key, List<Entry> additions, List<Entry> deletions) throws BackendException {
         Preconditions.checkNotNull(store);
         if (additions.isEmpty() && deletions.isEmpty()) return;
 
         KCVEntryMutation m = new KCVEntryMutation(additions, deletions);
         final Map<StaticBuffer, KCVEntryMutation> storeMutation = mutations.computeIfAbsent(store, k -> new HashMap<>());
-        KCVEntryMutation existingM = storeMutation.get(key);
+        KCVEntryMutation existingM = storeMutation.get(key); //获取当前数据库中的信息
         if (existingM != null) {
-            existingM.merge(m);
+            existingM.merge(m); //合并
         } else {
-            storeMutation.put(key, m);
+            storeMutation.put(key, m);  //添加
         }
 
         numMutations += m.getTotalMutations();

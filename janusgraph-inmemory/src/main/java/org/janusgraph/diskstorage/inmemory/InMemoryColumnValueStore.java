@@ -36,7 +36,7 @@ import static org.janusgraph.graphdb.configuration.GraphDatabaseConfiguration.ST
 /**
  * Implements a "row" in the {@link InMemoryKeyColumnValueStore}, which is comprised of
  * column-value pairs. This data is held in a shared sorted array for space and retrieval efficiency, and is paged
- * when/if data size exceeds a threshold to avoid excessive copying on updates.
+ * when/if data size exceeds a threshold to avoid excessive copying on updates.【列值存储】
  */
 
 class InMemoryColumnValueStore {
@@ -95,6 +95,7 @@ class InMemoryColumnValueStore {
         }
     }
 
+    //
     synchronized void mutate(List<Entry> additions, List<StaticBuffer> deletions, StoreTransaction txh) {
         //Prepare data
         Entry[] add;

@@ -236,13 +236,14 @@ public class EdgeSerializer implements RelationReader {
         return writeRelation(relation, (InternalRelationType) relation.getType(), position, tx);
     }
 
+    //写入关系
     public StaticArrayEntry writeRelation(InternalRelation relation, InternalRelationType type, int position,
                                           TypeInspector tx) {
         assert type==relation.getType() || (type.getBaseType() != null
                 && type.getBaseType().equals(relation.getType()));
         Direction dir = EdgeDirection.fromPosition(position);
         Preconditions.checkArgument(type.isUnidirected(Direction.BOTH) || type.isUnidirected(dir));
-        long typeId = type.longId();
+        long typeId = type.longId();  //类型ID
         DirectionID dirID = getDirID(dir, relation.isProperty() ? RelationCategory.PROPERTY : RelationCategory.EDGE);
 
         DataOutput out = serializer.getDataOutput(DEFAULT_CAPACITY);

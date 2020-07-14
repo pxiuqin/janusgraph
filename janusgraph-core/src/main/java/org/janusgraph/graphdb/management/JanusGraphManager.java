@@ -44,7 +44,7 @@ import javax.script.Bindings;
  * mechanism by which to instantiate graph references on a given JanusGraph node and a graph
  * reference tracker (or graph cache). Any graph created using the property \"graph.graphname\" and
  * any graph defined at server start, i.e. in the server's YAML file, will go through this
- * JanusGraphManager.
+ * JanusGraphManager.【对图实例进行管理，Janus对遍历图实例也进行管理】
  */
 public class JanusGraphManager implements GraphManager {
 
@@ -100,6 +100,7 @@ public class JanusGraphManager implements GraphManager {
         }
     }
 
+    //配置Gremlin执行语句
     public void configureGremlinExecutor(GremlinExecutor gremlinExecutor) {
         this.gremlinExecutor = gremlinExecutor;
         final ScheduledExecutorService bindExecutor = Executors.newScheduledThreadPool(1);
@@ -108,6 +109,7 @@ public class JanusGraphManager implements GraphManager {
         bindExecutor.scheduleWithFixedDelay(new GremlinExecutorGraphBinder(this, this.gremlinExecutor), 0, 20L, TimeUnit.SECONDS);
     }
 
+    //构建一个可执行的Gremlin语句执行
     private class GremlinExecutorGraphBinder implements Runnable {
         final JanusGraphManager graphManager;
         final GremlinExecutor gremlinExecutor;
@@ -261,6 +263,7 @@ public class JanusGraphManager implements GraphManager {
         }
     }
 
+    //添加相关图数据库
     private void updateTraversalSource(String graphName, Graph graph, GremlinExecutor gremlinExecutor,
                                        JanusGraphManager graphManager){
         gremlinExecutor.getScriptEngineManager().put(graphName, graph);

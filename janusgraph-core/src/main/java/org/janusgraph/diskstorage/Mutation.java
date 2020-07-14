@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 
 /**
  * Container for collection mutations against a data store.
- * Mutations are either additions or deletions.
+ * Mutations are either additions or deletions.【对addtions和deletions进行合并处理】
  *
  * @author Matthias Broecheler (me@matthiasb.com)
  */

@@ -93,6 +93,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
+ * 【实现了整个JanusGraph的Tx操作】
  * @author Matthias Broecheler (me@matthiasb.com)
  */
 
@@ -1424,8 +1425,9 @@ public class StandardJanusGraphTx extends JanusGraphBlueprintsTransaction implem
             MetricManager.INSTANCE.getCounter(config.getGroupName(), "tx", "commit").inc();
         }
         try {
+            //判断当前事务是否进行了修改
             if (hasModifications()) {
-                graph.commit(addedRelations.getAll(), deletedRelations.values(), this);
+                graph.commit(addedRelations.getAll(), deletedRelations.values(), this);  //把修改进行commit处理
             } else {
                 txHandle.commit();
             }
@@ -1482,6 +1484,7 @@ public class StandardJanusGraphTx extends JanusGraphBlueprintsTransaction implem
         return !isOpen;
     }
 
+    //当前是否是否进行了修改，判断添加或删除，update可以通过先delete再add来操作
     @Override
     public boolean hasModifications() {
         return !addedRelations.isEmpty() || !deletedRelations.isEmpty();

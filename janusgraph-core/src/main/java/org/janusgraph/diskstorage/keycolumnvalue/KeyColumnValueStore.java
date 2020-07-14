@@ -50,7 +50,7 @@ public interface KeyColumnValueStore {
      * @throws org.janusgraph.diskstorage.BackendException when columnEnd &lt; columnStart
      * @see KeySliceQuery
      */
-    EntryList getSlice(KeySliceQuery query, StoreTransaction txh) throws BackendException;
+    EntryList getSlice(KeySliceQuery query, StoreTransaction txh) throws BackendException;  //获取一个切片内数据
 
     /**
      * Retrieves the list of entries (i.e. column-value pairs) as specified by the given {@link SliceQuery} for all
@@ -71,7 +71,7 @@ public interface KeyColumnValueStore {
      * {@code key} in the underlying data store. Deletions are applied strictly
      * before additions. In other words, if both an addition and deletion are
      * supplied for the same column, then the column will first be deleted and
-     * then the supplied Entry for the column will be added.
+     * then the supplied Entry for the column will be added. 【添加和删除mutate是需要先删除然后在添加】
      * <p>
      * <p>
      * <p>

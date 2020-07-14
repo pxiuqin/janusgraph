@@ -97,7 +97,7 @@ import io.vavr.concurrent.Future;
 import io.vavr.control.Try;
 
 /**
- * An implementation of {@link KeyColumnValueStore} which stores the data in a CQL connected backend.
+ * An implementation of {@link KeyColumnValueStore} which stores the data in a CQL connected backend.【基于Cassandra实现的KCVStore】
  */
 public class CQLKeyColumnValueStore implements KeyColumnValueStore {
 
@@ -105,8 +105,8 @@ public class CQLKeyColumnValueStore implements KeyColumnValueStore {
     private static final String WRITETIME_FUNCTION_NAME = "writetime";
 
     public static final String KEY_COLUMN_NAME = "key";
-    public static final String COLUMN_COLUMN_NAME = "column1";
-    public static final String VALUE_COLUMN_NAME = "value";
+    public static final String COLUMN_COLUMN_NAME = "column1";  //内部对column的字段定义
+    public static final String VALUE_COLUMN_NAME = "value";   //内部对value的字段定义
     static final String WRITETIME_COLUMN_NAME = "writetime";
     static final String TTL_COLUMN_NAME = "ttl";
 
@@ -219,6 +219,7 @@ public class CQLKeyColumnValueStore implements KeyColumnValueStore {
         // @formatter:on
     }
 
+    //初始化开始构建表
     private static void initializeTable(final Session session, final String keyspaceName, final String tableName, final Configuration configuration) {
         final Options createTable = createTable(keyspaceName, tableName)
                 .ifNotExists()
@@ -242,7 +243,7 @@ public class CQLKeyColumnValueStore implements KeyColumnValueStore {
                 Case($("LZ4Compressor"), lz4()),
                 Case($("SnappyCompressor"), snappy()),
                 Case($("DeflateCompressor"), deflate()))
-                .withChunkLengthInKb(configuration.get(CF_COMPRESSION_BLOCK_SIZE));
+                .withChunkLengthInKb(configuration.get(CF_COMPRESSION_BLOCK_SIZE));  //压缩方式
     }
 
     private static CompactionOptions<?> compactionOptions(final Configuration configuration) {
@@ -254,7 +255,7 @@ public class CQLKeyColumnValueStore implements KeyColumnValueStore {
                 .of(
                         Case($("SizeTieredCompactionStrategy"), sizedTieredStategy()),
                         Case($("DateTieredCompactionStrategy"), dateTieredStrategy()),
-                        Case($("LeveledCompactionStrategy"), leveledStrategy()));
+                        Case($("LeveledCompactionStrategy"), leveledStrategy()));  //合并方式
         Array.of(configuration.get(COMPACTION_OPTIONS))
                 .grouped(2)
                 .forEach(keyValue -> compactionOptions.freeformOption(keyValue.get(0), keyValue.get(1)));
@@ -280,7 +281,7 @@ public class CQLKeyColumnValueStore implements KeyColumnValueStore {
                         .setBytes(SLICE_START_BINDING, query.getSliceStart().asByteBuffer())
                         .setBytes(SLICE_END_BINDING, query.getSliceEnd().asByteBuffer())
                         .setInt(LIMIT_BINDING, query.getLimit())
-                        .setConsistencyLevel(getTransaction(txh).getReadConsistencyLevel())))
+                        .setConsistencyLevel(getTransaction(txh).getReadConsistencyLevel()))) //设置一致性的情况
                 .map(resultSet -> fromResultSet(resultSet, this.getter));
         interruptibleWait(result);
         return result.getValue().get().getOrElseThrow(EXCEPTION_MAPPER);
@@ -333,7 +334,7 @@ public class CQLKeyColumnValueStore implements KeyColumnValueStore {
             return nextRow == null
                 ? null
                 : Tuple.of(StaticArrayBuffer.of(nextRow.getBytes(COLUMN_COLUMN_NAME)),
-                           StaticArrayBuffer.of(nextRow.getBytes(VALUE_COLUMN_NAME)), nextRow);
+                           StaticArrayBuffer.of(nextRow.getBytes(VALUE_COLUMN_NAME)), nextRow);  //获取相关列值【column1和value】
         }
 
         @Override
@@ -349,7 +350,7 @@ public class CQLKeyColumnValueStore implements KeyColumnValueStore {
         return this.deleteColumn.bind()
                 .setBytes(KEY_BINDING, key.asByteBuffer())
                 .setBytes(COLUMN_BINDING, column.asByteBuffer())
-                .setLong(TIMESTAMP_BINDING, timestamp);
+                .setLong(TIMESTAMP_BINDING, timestamp);  //给定相关语句中的变量情况
     }
 
     /*
