@@ -30,7 +30,7 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
  * <br>
  * A JanusGraphRelation is either directed, or unidirected. Properties are always directed (connecting a vertex
  * with a value). A unidirected edge is a special type of directed edge where the connection is only established from the
- * perspective of the outgoing vertex. In that sense, a unidirected edge is akin to a link.
+ * perspective of the outgoing vertex. In that sense, a unidirected edge is akin to a link.【边和属性都复用这个Relation对象】
  *
  * @author Matthias Br&ouml;cheler (http://www.matthiasb.com)
  * @see JanusGraphEdge

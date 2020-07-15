@@ -22,7 +22,7 @@ import org.janusgraph.graphdb.query.vertex.VertexCentricQueryBuilder;
 import org.janusgraph.util.datastructures.Retriever;
 
 /**
- * Internal Vertex interface adding methods that should only be used by JanusGraph
+ * Internal Vertex interface adding methods that should only be used by JanusGraph【节点操作的接口定义】
  *
  * @author Matthias Broecheler (me@matthiasb.com)
  */

@@ -206,6 +206,7 @@ public class StandardJanusGraphTx extends JanusGraphBlueprintsTransaction implem
         this.indexSerializer = graph.getIndexSerializer();
         this.indexSelector = graph.getIndexSelector();
 
+        //生成ID
         temporaryIds = new IDPool() {
 
             private final AtomicLong counter = new AtomicLong(1);
@@ -441,6 +442,7 @@ public class StandardJanusGraphTx extends JanusGraphBlueprintsTransaction implem
         return vertexCache.get(vertexId, internalVertexRetriever);
     }
 
+    //节点构造
     private class VertexConstructor implements Retriever<Long, InternalVertex> {
 
         private final boolean verifyExistence;
@@ -455,6 +457,7 @@ public class StandardJanusGraphTx extends JanusGraphBlueprintsTransaction implem
             return verifyExistence;
         }
 
+        //基于节点构建InternalVertex
         @Override
         public InternalVertex get(Long vertexId) {
             Preconditions.checkArgument(vertexId!=null && vertexId > 0, "Invalid vertex id: %s",vertexId);
@@ -472,15 +475,15 @@ public class StandardJanusGraphTx extends JanusGraphBlueprintsTransaction implem
             }
 
             final InternalVertex vertex;
-            if (idInspector.isRelationTypeId(vertexId)) {
-                if (idInspector.isPropertyKeyId(vertexId)) {
+            if (idInspector.isRelationTypeId(vertexId)) {  //判断是否RelationType
+                if (idInspector.isPropertyKeyId(vertexId)) {  //判断是否属性
                     if (IDManager.isSystemRelationTypeId(vertexId)) {
                         vertex = SystemTypeManager.getSystemType(vertexId);
                     } else {
                         vertex = new PropertyKeyVertex(StandardJanusGraphTx.this, vertexId, lifecycle);
                     }
                 } else {
-                    assert idInspector.isEdgeLabelId(vertexId);
+                    assert idInspector.isEdgeLabelId(vertexId);  //是边
                     if (IDManager.isSystemRelationTypeId(vertexId)) {
                         vertex = SystemTypeManager.getSystemType(vertexId);
                     } else {
@@ -499,6 +502,7 @@ public class StandardJanusGraphTx extends JanusGraphBlueprintsTransaction implem
         }
     }
 
+    //实现添加节点接口
     @Override
     public JanusGraphVertex addVertex(Long vertexId, VertexLabel label) {
         verifyWriteAccess();
@@ -513,7 +517,7 @@ public class StandardJanusGraphTx extends JanusGraphBlueprintsTransaction implem
         Preconditions.checkArgument(vertexId == null || !config.hasVerifyExternalVertexExistence() || !containsVertex(vertexId), "Vertex with given id already exists: %s", vertexId);
         StandardVertex vertex = new StandardVertex(this, IDManager.getTemporaryVertexID(IDManager.VertexIDType.NormalVertex, temporaryIds.nextID()), ElementLifeCycle.New);
         if (vertexId != null) {
-            vertex.setId(vertexId);
+            vertex.setId(vertexId);  //创建一个新的节点
         } else if (config.hasAssignIDsImmediately() || label.isPartitioned()) {
             graph.assignID(vertex,label);
         }
@@ -703,8 +707,8 @@ public class StandardJanusGraphTx extends JanusGraphBlueprintsTransaction implem
 
     public JanusGraphEdge addEdge(JanusGraphVertex outVertex, JanusGraphVertex inVertex, EdgeLabel label) {
         verifyWriteAccess(outVertex, inVertex);
-        outVertex = ((InternalVertex) outVertex).it();
-        inVertex = ((InternalVertex) inVertex).it();
+        outVertex = ((InternalVertex) outVertex).it(); //出度点
+        inVertex = ((InternalVertex) inVertex).it();  //入度点
         Preconditions.checkNotNull(label);
         checkConnectionConstraintOrCreateConnectionConstraint(outVertex, inVertex, label);
         Multiplicity multiplicity = label.multiplicity();

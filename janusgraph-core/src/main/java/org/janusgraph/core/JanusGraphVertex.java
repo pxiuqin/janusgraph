@@ -51,7 +51,7 @@ public interface JanusGraphVertex extends JanusGraphElement, Vertex {
      * @return new edge
      */
     @Override
-    JanusGraphEdge addEdge(String label, Vertex vertex, Object... keyValues);
+    JanusGraphEdge addEdge(String label, Vertex vertex, Object... keyValues);  //基于当前节点添加边
 
     /**
      * Creates a new property for this vertex and given key with the specified value.

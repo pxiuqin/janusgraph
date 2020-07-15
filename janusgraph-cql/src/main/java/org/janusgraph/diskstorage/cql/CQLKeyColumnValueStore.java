@@ -348,7 +348,7 @@ public class CQLKeyColumnValueStore implements KeyColumnValueStore {
      */
     Statement deleteColumn(final StaticBuffer key, final StaticBuffer column, final long timestamp) {
         return this.deleteColumn.bind()
-                .setBytes(KEY_BINDING, key.asByteBuffer())
+                .setBytes(KEY_BINDING, key.asByteBuffer())  //key处理
                 .setBytes(COLUMN_BINDING, column.asByteBuffer())
                 .setLong(TIMESTAMP_BINDING, timestamp);  //给定相关语句中的变量情况
     }

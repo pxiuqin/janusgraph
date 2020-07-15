@@ -39,8 +39,8 @@ public interface JanusGraphEdge extends JanusGraphRelation, Edge {
      * @return edge label of this edge
      */
     default EdgeLabel edgeLabel() {
-        assert getType() instanceof EdgeLabel;
-        return (EdgeLabel)getType();
+        assert getType() instanceof EdgeLabel; //判断下类型
+        return (EdgeLabel)getType();  //返回EdgeLabel
     }
 
     /**
@@ -50,7 +50,7 @@ public interface JanusGraphEdge extends JanusGraphRelation, Edge {
      * @param dir Direction of IN or OUT
      * @return the vertex for the specified direction
      */
-    JanusGraphVertex vertex(Direction dir);
+    JanusGraphVertex vertex(Direction dir);  //基于方向返回和边相关的节点
 
     @Override
     default JanusGraphVertex outVertex() {
@@ -70,11 +70,12 @@ public interface JanusGraphEdge extends JanusGraphRelation, Edge {
      * @return The vertex at the opposite end of the edge.
      * @throws InvalidElementException if the edge is not incident on the specified vertex
      */
-    JanusGraphVertex otherVertex(Vertex vertex);
+    JanusGraphVertex otherVertex(Vertex vertex);  //包含这个节点的其他节点
 
 
     @Override
     default Iterator<Vertex> vertices(Direction direction) {
+        //如果是双向的返回入度和出度节点
         if (direction==Direction.BOTH) {
             return Stream.of((Vertex) vertex(Direction.OUT), vertex(Direction.IN)).iterator();
         }

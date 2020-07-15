@@ -478,13 +478,15 @@ public class CQLStoreManager extends DistributedStoreManager implements KeyColum
                 return Iterator.concat(deletions, additions);
             });
         }));
+
+        //异步执行生成的cal语句
         final Future<ResultSet> result = Future.fromJavaFuture(this.executorService, this.session.executeAsync(batchStatement));
 
-        result.await();
+        result.await(); //等待结果执行完成
         if (result.isFailure()) {
             throw EXCEPTION_MAPPER.apply(result.getCause().get());
         }
-        sleepAfterWrite(txh, commitTime);
+        sleepAfterWrite(txh, commitTime);  //事务方面保证，通过时间？
     }
 
     // Create an async un-logged batch per partition key
@@ -492,8 +494,8 @@ public class CQLStoreManager extends DistributedStoreManager implements KeyColum
         final MaskedTimestamp commitTime = new MaskedTimestamp(txh);
 
         final Future<Seq<ResultSet>> result = Future.sequence(this.executorService, Iterator.ofAll(mutations.entrySet()).flatMap(tableNameAndMutations -> {
-            final String tableName = tableNameAndMutations.getKey();
-            final Map<StaticBuffer, KCVMutation> tableMutations = tableNameAndMutations.getValue();
+            final String tableName = tableNameAndMutations.getKey();  //表名
+            final Map<StaticBuffer, KCVMutation> tableMutations = tableNameAndMutations.getValue();  //数据
 
             final CQLKeyColumnValueStore columnValueStore = Option.of(this.openStores.get(tableName))
                     .getOrElseThrow(() -> new IllegalStateException("Store cannot be found: " + tableName));
@@ -507,12 +509,12 @@ public class CQLStoreManager extends DistributedStoreManager implements KeyColum
                         .flatMap(addTime -> Iterator.ofAll(keyMutations.getAdditions()).map(addition -> columnValueStore.insertColumn(key, addition, addTime)));
 
                 return Iterator.concat(deletions, additions)
-                        .grouped(this.batchSize)
-                        .map(group -> Future.fromJavaFuture(this.executorService,
+                        .grouped(this.batchSize)  //按照batchSize来完成分组
+                        .map(group -> Future.fromJavaFuture(this.executorService,  //按照每个分组执行
                                 this.session.executeAsync(
-                                        new BatchStatement(Type.UNLOGGED)
+                                        new BatchStatement(Type.UNLOGGED)  //每个分组都定义无日志
                                                 .addAll(group)
-                                                .setConsistencyLevel(getTransaction(txh).getWriteConsistencyLevel()))));
+                                                .setConsistencyLevel(getTransaction(txh).getWriteConsistencyLevel())))); //给定一个一致性写入要求
             });
         }));
 

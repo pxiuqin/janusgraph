@@ -136,10 +136,11 @@ public abstract class DistributedStoreManager extends AbstractStoreManager {
         return hn.substring(0, Math.min(hn.length(), 256)) + ":" + port;
     }
 
+    //执行写入的等待时间
     protected void sleepAfterWrite(StoreTransaction txh, MaskedTimestamp mustPass) throws BackendException {
         assert mustPass.getDeletionTime(times) < mustPass.getAdditionTime(times);
         try {
-            times.sleepPast(mustPass.getAdditionTimeInstant(times));
+            times.sleepPast(mustPass.getAdditionTimeInstant(times));  //给定一个超时处理
         } catch (InterruptedException e) {
             throw new PermanentBackendException("Unexpected interrupt", e);
         }

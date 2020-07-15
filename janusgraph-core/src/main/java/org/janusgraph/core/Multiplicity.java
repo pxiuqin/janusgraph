@@ -32,23 +32,23 @@ public enum Multiplicity {
      *
      * <a href="https://en.wikipedia.org/wiki/Multigraph">https://en.wikipedia.org/wiki/Multigraph</a>
      */
-    MULTI,
+    MULTI,  //多重图
 
     /**
      * The given edge label specifies a simple graph, meaning that the multiplicity is not constrained but that there
      * can only be at most a single edge of this label between a given pair of vertices.
      */
-    SIMPLE,
+    SIMPLE,  //简单图
 
     /**
      * There can only be a single in-edge of this label for a given vertex but multiple out-edges (i.e. in-unique)
      */
-    ONE2MANY,
+    ONE2MANY,  //单进多出
 
     /**
      * There can only be a single out-edge of this label for a given vertex but multiple in-edges (i.e. out-unique)
      */
-    MANY2ONE,
+    MANY2ONE,//多进单出
 
     /**
      * There can be only a single in and out-edge of this label for a given vertex (i.e. unique in both directions).

@@ -32,6 +32,7 @@ import java.util.function.Supplier;
 
 public class KCVMutation extends Mutation<Entry,StaticBuffer> {
 
+    //add和delete类型不同是因为在存储到数据backend中add需要存入具体数据
     public KCVMutation(List<Entry> additions, List<StaticBuffer> deletions) {
         super(additions, deletions);
     }

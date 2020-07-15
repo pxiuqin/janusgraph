@@ -23,6 +23,7 @@ import org.apache.tinkerpop.gremlin.structure.util.StringFactory;
 import java.util.Iterator;
 
 /**
+ * 节点属性数据
  * @author Matthias Broecheler (me@matthiasb.com)
  */
 
