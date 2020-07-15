@@ -60,6 +60,7 @@ public abstract class KCVSCache extends KCVSProxy {
         throw new UnsupportedOperationException("Only supports mutateEntries()");
     }
 
+    //合并操作
     public void mutateEntries(StaticBuffer key, List<Entry> additions, List<Entry> deletions, StoreTransaction txh) throws BackendException {
         assert txh instanceof CacheTransaction;
         ((CacheTransaction) txh).mutate(this, key, additions, deletions);

@@ -141,7 +141,7 @@ public class CQLStoreManager extends DistributedStoreManager implements KeyColum
     static final String CONSISTENCY_LOCAL_QUORUM = "LOCAL_QUORUM";
     static final String CONSISTENCY_QUORUM = "QUORUM";
 
-    private static final int DEFAULT_PORT = 9042;
+    private static final int DEFAULT_PORT = 9042;  //直接给定了默认端口，Cassandra
 
     private final String keyspace;
     private final int batchSize;
@@ -154,7 +154,7 @@ public class CQLStoreManager extends DistributedStoreManager implements KeyColum
     @Resource
     private Session session;
     private final StoreFeatures storeFeatures;
-    private final Map<String, CQLKeyColumnValueStore> openStores;
+    private final Map<String, CQLKeyColumnValueStore> openStores;   //表以及存储记录的映射
     private final Deployment deployment;
 
     /**
@@ -163,11 +163,12 @@ public class CQLStoreManager extends DistributedStoreManager implements KeyColum
      * @throws BackendException
      */
     public CQLStoreManager(final Configuration configuration) throws BackendException {
-        super(configuration, DEFAULT_PORT);
+        super(configuration, DEFAULT_PORT);  //如果没有配置端口就会使用默认端口
         this.keyspace = determineKeyspaceName(configuration);
         this.batchSize = configuration.get(BATCH_STATEMENT_SIZE);
         this.atomicBatch = configuration.get(ATOMIC_BATCH_MUTATE);
 
+        //给定了线程池
         this.executorService = new ThreadPoolExecutor(10,
                 100,
                 1,
@@ -195,7 +196,7 @@ public class CQLStoreManager extends DistributedStoreManager implements KeyColum
 
         final Boolean useExternalLocking = configuration.get(USE_EXTERNAL_LOCKING);
 
-        final StandardStoreFeatures.Builder fb = new StandardStoreFeatures.Builder();
+        final StandardStoreFeatures.Builder fb = new StandardStoreFeatures.Builder();   //存储引擎的特点
 
         fb.batchMutation(true).distributed(true);
         fb.timestamps(true).cellTTL(true);
@@ -319,25 +320,27 @@ public class CQLStoreManager extends DistributedStoreManager implements KeyColum
         return builder.withPoolingOptions(poolingOptions).build();
     }
 
+    //cql-driver的初始化session
     Session initializeSession(final String keyspaceName) {
         final Session s = this.cluster.connect();
 
-        // if the keyspace already exists, just return the session
+        // if the keyspace already exists, just return the session【判断相关db是否存在】
         if (this.cluster.getMetadata().getKeyspace(keyspaceName) != null) {
             return s;
         }
 
         final Configuration configuration = getStorageConfig();
-        // Setting replication strategy based on value reading from the configuration: either "SimpleStrategy" or "NetworkTopologyStrategy"
-        final Map<String, Object> replication = Match(configuration.get(REPLICATION_STRATEGY)).of(
-            Case($("SimpleStrategy"), strategy -> HashMap.<String, Object> of("class", strategy, "replication_factor", configuration.get(REPLICATION_FACTOR))),
-            Case($("NetworkTopologyStrategy"),
+        // Setting replication strategy based on value reading from the configuration: either "SimpleStrategy" or "NetworkTopologyStrategy"【数据复制使用的方式】
+        final Map<String, Object> replication = Match(configuration.get(REPLICATION_STRATEGY)).of(//复制策略
+            Case($("SimpleStrategy"), strategy -> HashMap.<String, Object> of("class", strategy, "replication_factor", configuration.get(REPLICATION_FACTOR))),  //确定复制因子
+            Case($("NetworkTopologyStrategy"),  //使用网络拓扑策略
                 strategy -> HashMap.<String, Object> of("class", strategy)
                     .merge(Array.of(configuration.get(REPLICATION_OPTIONS))
                         .grouped(2)
                         .toMap(array -> Tuple.of(array.get(0), Integer.parseInt(array.get(1)))))))
             .toJavaMap();
 
+        //执行创建db
         s.execute(createKeyspace(keyspaceName)
                 .ifNotExists()
                 .with()
@@ -357,6 +360,7 @@ public class CQLStoreManager extends DistributedStoreManager implements KeyColum
         return this.keyspace;
     }
 
+    //获取压缩方式
     Map<String, String> getCompressionOptions(final String name) throws BackendException {
         final KeyspaceMetadata keyspaceMetadata = Option.of(this.cluster.getMetadata().getKeyspace(this.keyspace))
                 .getOrElseThrow(() -> new PermanentBackendException(String.format("Unknown keyspace '%s'", this.keyspace)));
@@ -365,6 +369,7 @@ public class CQLStoreManager extends DistributedStoreManager implements KeyColum
                 .getOrElseThrow(() -> new PermanentBackendException(String.format("Unknown table '%s'", name)));
     }
 
+    //获取元数据
     TableMetadata getTableMetadata(final String name) throws BackendException {
         final KeyspaceMetadata keyspaceMetadata = Option.of(this.cluster.getMetadata().getKeyspace(this.keyspace))
                 .getOrElseThrow(() -> new PermanentBackendException(String.format("Unknown keyspace '%s'", this.keyspace)));
@@ -400,6 +405,7 @@ public class CQLStoreManager extends DistributedStoreManager implements KeyColum
         return this.storeFeatures;
     }
 
+    //构建数据存储
     @Override
     public KeyColumnValueStore openDatabase(final String name, final Container metaData) throws BackendException {
         Supplier<Boolean> initializeTable = () -> Optional.ofNullable(this.cluster.getMetadata().getKeyspace(this.keyspace)).map(k -> k.getTable(name) == null).orElse(true);
@@ -414,7 +420,7 @@ public class CQLStoreManager extends DistributedStoreManager implements KeyColum
     @Override
     public void clearStorage() throws BackendException {
         if (this.storageConfig.get(DROP_ON_CLEAR)) {
-            this.session.execute(dropKeyspace(this.keyspace));
+            this.session.execute(dropKeyspace(this.keyspace));  //删除数据库
         } else if (this.exists()) {
             final Future<Seq<ResultSet>> result = Future.sequence(
                 Iterator.ofAll(this.cluster.getMetadata().getKeyspace(this.keyspace).getTables())
@@ -440,7 +446,7 @@ public class CQLStoreManager extends DistributedStoreManager implements KeyColum
         if (this.atomicBatch) {
             mutateManyLogged(mutations, txh);
         } else {
-            mutateManyUnlogged(mutations, txh);
+            mutateManyUnlogged(mutations, txh);  //无日志batch处理
         }
     }
 
@@ -448,21 +454,24 @@ public class CQLStoreManager extends DistributedStoreManager implements KeyColum
     private void mutateManyLogged(final Map<String, Map<StaticBuffer, KCVMutation>> mutations, final StoreTransaction txh) throws BackendException {
         final MaskedTimestamp commitTime = new MaskedTimestamp(txh);
 
-        final BatchStatement batchStatement = new BatchStatement(Type.LOGGED);
-        batchStatement.setConsistencyLevel(getTransaction(txh).getWriteConsistencyLevel());
+        final BatchStatement batchStatement = new BatchStatement(Type.LOGGED);  //批量处理mutation【在一个批处理中相当于一个事务操作】
+        batchStatement.setConsistencyLevel(getTransaction(txh).getWriteConsistencyLevel());  //确定一致性Level
 
         batchStatement.addAll(Iterator.ofAll(mutations.entrySet()).flatMap(tableNameAndMutations -> {
-            final String tableName = tableNameAndMutations.getKey();
-            final Map<StaticBuffer, KCVMutation> tableMutations = tableNameAndMutations.getValue();
+            final String tableName = tableNameAndMutations.getKey();  //获取表名称
+            final Map<StaticBuffer, KCVMutation> tableMutations = tableNameAndMutations.getValue();  //数据
 
             final CQLKeyColumnValueStore columnValueStore = Option.of(this.openStores.get(tableName))
                     .getOrElseThrow(() -> new IllegalStateException("Store cannot be found: " + tableName));
             return Iterator.ofAll(tableMutations.entrySet()).flatMap(keyAndMutations -> {
-                final StaticBuffer key = keyAndMutations.getKey();
-                final KCVMutation keyMutations = keyAndMutations.getValue();
+                final StaticBuffer key = keyAndMutations.getKey();  //key数据
+                final KCVMutation keyMutations = keyAndMutations.getValue();  //KCV结构
 
+                //处理删除数据操作
                 final Iterator<Statement> deletions = Iterator.of(commitTime.getDeletionTime(this.times))
                         .flatMap(deleteTime -> Iterator.ofAll(keyMutations.getDeletions()).map(deletion -> columnValueStore.deleteColumn(key, deletion, deleteTime)));
+
+                //处理添加数据操作
                 final Iterator<Statement> additions = Iterator.of(commitTime.getAdditionTime(this.times))
                         .flatMap(addTime -> Iterator.ofAll(keyMutations.getAdditions()).map(addition -> columnValueStore.insertColumn(key, addition, addTime)));
 

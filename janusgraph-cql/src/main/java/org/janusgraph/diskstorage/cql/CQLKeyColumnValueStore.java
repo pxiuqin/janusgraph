@@ -344,7 +344,7 @@ public class CQLKeyColumnValueStore implements KeyColumnValueStore {
     }
 
     /*
-     * Used from CQLStoreManager
+     * Used from CQLStoreManager【删除数据操作】
      */
     Statement deleteColumn(final StaticBuffer key, final StaticBuffer column, final long timestamp) {
         return this.deleteColumn.bind()
@@ -354,7 +354,7 @@ public class CQLKeyColumnValueStore implements KeyColumnValueStore {
     }
 
     /*
-     * Used from CQLStoreManager
+     * Used from CQLStoreManager【插入数据操作】
      */
     Statement insertColumn(final StaticBuffer key, final Entry entry, final long timestamp) {
         final Integer ttl = (Integer) entry.getMetaData().get(EntryMetaData.TTL);

@@ -19,7 +19,7 @@ import org.janusgraph.diskstorage.keycolumnvalue.scan.ScanJob;
 import org.janusgraph.diskstorage.util.time.TimestampProviders;
 
 /**
- * Describes features supported by a storage backend.
+ * Describes features supported by a storage backend.【描述一个backend的存储特性】
  *
  * @author Matthias Broecheler (me@matthiasb.com)
  * @author Dan LaRocque (dalaro@hopcount.org)
@@ -60,9 +60,11 @@ public interface StoreFeatures {
     boolean hasLocking();
 
     /**
-     * Whether this storage backend supports batch mutations via
+     * Whether this storage backend supports batch mutations via  【转换合并多个写入记录为一个】
      * {@link KeyColumnValueStoreManager#mutateMany(java.util.Map, StoreTransaction)}.
-     *
+     * 1.把多次更新操作合并为一次请求，减少客户端和服务端的网络交互。
+     * 2.batch中同一个partition key的操作具有隔离性。
+     * 3.默认的LOGGED类型可以保证batch中的所有操作要么（最终）全部成功，要么全部失败。也就是原子性。
      */
     boolean hasBatchMutation();
 

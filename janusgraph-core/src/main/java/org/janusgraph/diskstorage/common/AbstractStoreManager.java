@@ -52,6 +52,7 @@ public abstract class AbstractStoreManager implements StoreManager {
         return storageConfig;
     }
 
+    //获取元数据
     public EntryMetaData[] getMetaDataSchema(String storeName) {
         List<EntryMetaData> schemaBuilder = new ArrayList<>(3);
         StoreFeatures features = getFeatures();

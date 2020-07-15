@@ -28,7 +28,7 @@ import java.util.Random;
 import static org.janusgraph.graphdb.configuration.GraphDatabaseConfiguration.*;
 
 /**
- * Abstract class that handles configuration options shared by all distributed storage backends
+ * Abstract class that handles configuration options shared by all distributed storage backends【分布式存储管理需要继承实现相关方法】
  *
  * @author Matthias Broecheler (me@matthiasb.com)
  */
@@ -37,6 +37,7 @@ public abstract class DistributedStoreManager extends AbstractStoreManager {
 
     protected final TimestampProvider times;
 
+    //部署方式
     public enum Deployment {
 
         /**
@@ -68,7 +69,7 @@ public abstract class DistributedStoreManager extends AbstractStoreManager {
     protected final String password;
 
 
-
+    //初始化配置
     public DistributedStoreManager(Configuration storageConfig, int portDefault) {
         super(storageConfig);
         this.hostnames = storageConfig.get(STORAGE_HOSTS);
@@ -77,7 +78,7 @@ public abstract class DistributedStoreManager extends AbstractStoreManager {
         else this.port = portDefault;
         this.connectionTimeoutMS = storageConfig.get(CONNECTION_TIMEOUT);
         this.pageSize = storageConfig.get(PAGE_SIZE);
-        this.times = storageConfig.get(TIMESTAMP_PROVIDER);
+        this.times = storageConfig.get(TIMESTAMP_PROVIDER);  //timestamp的方式
 
         if (storageConfig.has(AUTH_USERNAME)) {
             this.username = storageConfig.get(AUTH_USERNAME);
@@ -146,7 +147,7 @@ public abstract class DistributedStoreManager extends AbstractStoreManager {
 
     /**
      * Helper class to create the deletion and addition timestamps for a particular transaction.
-     * It needs to be ensured that the deletion time is prior to the addition time since
+     * It needs to be ensured that the deletion time is prior to the addition time since 【add和delete在时间保持一个顺序】
      * some storage backends use the time to resolve conflicts.
      */
     public static class MaskedTimestamp {

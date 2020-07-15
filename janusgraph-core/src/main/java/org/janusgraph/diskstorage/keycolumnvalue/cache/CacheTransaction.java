@@ -41,7 +41,7 @@ public class CacheTransaction implements StoreTransaction, LoggableTransaction {
     private final Duration maxWriteTime;
 
     private int numMutations;
-    private final Map<KCVSCache, Map<StaticBuffer, KCVEntryMutation>> mutations;
+    private final Map<KCVSCache, Map<StaticBuffer, KCVEntryMutation>> mutations; //mutation的组成部分
 
     public CacheTransaction(StoreTransaction tx, KeyColumnValueStoreManager manager,
                              int persistChunkSize, Duration maxWriteTime, boolean batchLoading) {
@@ -85,11 +85,12 @@ public class CacheTransaction implements StoreTransaction, LoggableTransaction {
         }
     }
 
+    //存储到backend
     private int persist(final Map<String, Map<StaticBuffer, KCVMutation>> subMutations) {
         BackendOperation.execute(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
-                manager.mutateMany(subMutations, tx);
+                manager.mutateMany(subMutations, tx);  //调用具体backend实现的方法
                 return true;
             }
 
@@ -119,6 +120,7 @@ public class CacheTransaction implements StoreTransaction, LoggableTransaction {
         return new KCVMutation(mutation.getAdditions(), KeyColumnValueStore.NO_DELETIONS);
     }
 
+    //flush操作到存储backend
     private void flushInternal() throws BackendException {
         if (numMutations > 0) {
             //Consolidate all mutations prior to persistence to ensure that no addition accidentally gets swallowed by a delete

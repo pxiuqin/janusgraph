@@ -24,6 +24,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
+ * 保留Mutation结构-然后在具体backend解析处理delete和add
  * {@link Mutation} type for {@link KeyColumnValueStore}.
  *
  * @author Matthias Broecheler (me@matthiasb.com)

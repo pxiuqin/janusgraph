@@ -24,7 +24,7 @@ import com.datastax.driver.core.ConsistencyLevel;
 import com.google.common.base.Preconditions;
 
 /**
- * This class manages the translation of read and write consistency configuration values to CQL API {@link ConsistencyLevel} types.
+ * This class manages the translation of read and write consistency configuration values to CQL API {@link ConsistencyLevel} types.【CQL事务处理】
  */
 public class CQLTransaction extends AbstractStoreTransaction {
 

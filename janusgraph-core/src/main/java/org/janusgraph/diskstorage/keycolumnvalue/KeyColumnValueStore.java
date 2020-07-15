@@ -28,7 +28,7 @@ import java.util.Map;
  * each of which is uniquely identified by a key. Each row is composed of a column-value pairs. For a given key, a subset of the column-value
  * pairs that fall within a column interval can be quickly retrieved.【使用WideRow存储方式转换的接口】
  * <p>
- * This interface provides methods for retrieving and mutating the data.
+ * This interface provides methods for retrieving and mutating the data.【janus图的存储方式】
  * <p>
  * In this generic representation keys, columns and values are represented as ByteBuffers.
  * <p>

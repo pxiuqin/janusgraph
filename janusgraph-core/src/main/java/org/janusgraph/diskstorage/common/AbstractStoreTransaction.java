@@ -20,7 +20,7 @@ import org.janusgraph.diskstorage.BaseTransactionConfig;
 import org.janusgraph.diskstorage.keycolumnvalue.StoreTransaction;
 
 /**
- * Abstract implementation of {@link StoreTransaction} to be used as the basis for more specific implementations.
+ * Abstract implementation of {@link StoreTransaction} to be used as the basis for more specific implementations.【事务处理抽象类】
  *
  * @author Matthias Broecheler (me@matthiasb.com)
  */

@@ -21,7 +21,7 @@ import org.janusgraph.diskstorage.StoreMetaData;
 import java.util.Map;
 
 /**
- * KeyColumnValueStoreManager provides the persistence context to the graph database storage backend.
+ * KeyColumnValueStoreManager provides the persistence context to the graph database storage backend.【每个backend都需要实现相关的操作】
  * <p>
  * A KeyColumnValueStoreManager provides transaction handles across multiple data stores that
  * are managed by this KeyColumnValueStoreManager.
@@ -59,7 +59,7 @@ public interface KeyColumnValueStoreManager extends StoreManager {
      * Executes multiple mutations at once. For each store (identified by a string name) there is a map of (key,mutation) pairs
      * that specifies all the mutations to execute against the particular store for that key.
      *
-     * This is an optional operation. Check {@link #getFeatures()} if it is supported by a particular implementation.
+     * This is an optional operation. Check {@link #getFeatures()} if it is supported by a particular implementation.【各个backend实现相关】
      *
      * @param mutations
      * @param txh
