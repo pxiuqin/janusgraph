@@ -23,14 +23,14 @@ import org.janusgraph.graphdb.database.idhandling.VariableLong;
 
 /**
  * Handles the allocation of ids based on the type of element
- * Responsible for the bit-wise pattern of JanusGraph's internal id scheme.
+ * Responsible for the bit-wise pattern of JanusGraph's internal id scheme.【ID的二进制编码方式】
  *
  * @author Matthias Broecheler (me@matthiasb.com)
  */
 public class IDManager {
 
     /**
-     *bit mask- Description (+ indicates defined type, * indicates proper &amp; defined type)
+     *bit mask- Description (+ indicates defined type, * indicates proper &amp; defined type)【这里标识的是Padding位置的数据，也就是ID尾部的编码】
      *
      *      0 - + User created Vertex
      *    000 -     * Normal vertices
@@ -333,18 +333,20 @@ public class IDManager {
             }
         };
 
-        abstract long offset();
+        abstract long offset();   //偏移量
 
-        abstract long suffix();
+        abstract long suffix();  //后缀的bit位表示
 
-        abstract boolean isProper();
+        abstract boolean isProper();  //是否完整
 
+        //在count的基础上移位并填入相关padding，注：整个ID是由partition【分区】+count【流水号】+padding【ID类型】
         public final long addPadding(long count) {
             assert offset()>0;
             Preconditions.checkArgument(count>0 && count<(1L <<(TOTAL_BITS-offset())),"Count out of range for type [%s]: %s",this,count);
             return (count << offset()) | suffix();
         }
 
+        //
         public final long removePadding(long id) {
             return id >>> offset();
         }
@@ -376,12 +378,12 @@ public class IDManager {
      * We use only 63 bits to make sure that all ids are positive
      *
      */
-    private static final long TOTAL_BITS = Long.SIZE-1;
+    private static final long TOTAL_BITS = Long.SIZE-1;   //ID的编码长度
 
     /**
      * Maximum number of bits that can be used for the partition prefix of an id
      */
-    private static final long MAX_PARTITION_BITS = 16;
+    private static final long MAX_PARTITION_BITS = 16;  //分区位数最大不能超过16
     /**
      * Default number of bits used for the partition prefix. 0 means there is no partition prefix
      */
@@ -389,7 +391,7 @@ public class IDManager {
     /**
      * The padding bit width for user vertices
      */
-    public static final long USERVERTEX_PADDING_BITWIDTH = VertexIDType.NormalVertex.offset();
+    public static final long USERVERTEX_PADDING_BITWIDTH = VertexIDType.NormalVertex.offset();  //bit位为3
 
     /**
      * The maximum number of padding bits of any type
@@ -439,20 +441,22 @@ public class IDManager {
        ########################################################  */
 
      /*		--- JanusGraphElement id bit format ---
-      *  [ 0 | count | partition | ID padding (if any) ]
+      *  [ 0 | count | partition | ID padding (if any) ]  //求或操作后
      */
 
+    //构造ID
     private long constructId(long count, long partition, VertexIDType type) {
         Preconditions.checkArgument(partition<partitionIDBound && partition>=0,"Invalid partition: %s",partition);
         Preconditions.checkArgument(count>=0);
         Preconditions.checkArgument(VariableLong.unsignedBitLength(count)+partitionBits+
                 (type==null?0:type.offset())<=TOTAL_BITS);
-        Preconditions.checkArgument(type==null || type.isProper());
+        Preconditions.checkArgument(type==null || type.isProper());  //如果type不为null，就判断是叶子类型
         long id = (count<<partitionBits)+partition;
-        if (type!=null) id = type.addPadding(id);
+        if (type!=null) id = type.addPadding(id);  //然后再把类型添加到最后
         return id;
     }
 
+    //构建UserVertexIDType
     private static VertexIDType getUserVertexIDType(long vertexId) {
         VertexIDType type=null;
         if (VertexIDType.NormalVertex.is(vertexId)) type=VertexIDType.NormalVertex;
@@ -464,35 +468,39 @@ public class IDManager {
         return type;
     }
 
+    //判断是UserVertex类型，判断ID为图节点
     public final boolean isUserVertexId(long vertexId) {
         return (VertexIDType.NormalVertex.is(vertexId) || VertexIDType.PartitionedVertex.is(vertexId) || VertexIDType.UnmodifiableVertex.is(vertexId))
                 && ((vertexId>>>(partitionBits+USERVERTEX_PADDING_BITWIDTH))>0);
     }
 
+    //获取分区ID
     public long getPartitionId(long vertexId) {
-        if (VertexIDType.Schema.is(vertexId)) return SCHEMA_PARTITION;
+        if (VertexIDType.Schema.is(vertexId)) return SCHEMA_PARTITION;   //partition为0
         assert isUserVertexId(vertexId) && getUserVertexIDType(vertexId)!=null;
         long partition = (vertexId>>>USERVERTEX_PADDING_BITWIDTH) & (partitionIDBound-1);
         assert partition>=0;
         return partition;
     }
 
+    //Key不包括分区字段
     public StaticBuffer getKey(long vertexId) {
         if (VertexIDType.Schema.is(vertexId)) {
             //No partition for schema vertices
             return BufferUtil.getLongBuffer(vertexId);
         } else {
-            assert isUserVertexId(vertexId);
+            assert isUserVertexId(vertexId);   //用户定义的ID类型
             VertexIDType type = getUserVertexIDType(vertexId);
             assert type.offset()==USERVERTEX_PADDING_BITWIDTH;
             long partition = getPartitionId(vertexId);
-            long count = vertexId>>>(partitionBits+USERVERTEX_PADDING_BITWIDTH);
+            long count = vertexId>>>(partitionBits+USERVERTEX_PADDING_BITWIDTH);  //无符号移位操作左面补0
             assert count>0;
             long keyId = (partition<<partitionOffset) | type.addPadding(count);
             return BufferUtil.getLongBuffer(keyId);
         }
     }
 
+    //基于Key的值转换成KeyID
     public long getKeyID(StaticBuffer b) {
         long value = b.getLong(0);
         if (VertexIDType.Schema.is(value)) {
@@ -505,12 +513,13 @@ public class IDManager {
         }
     }
 
+    //关系ID不同指定类型？
     public long getRelationID(long count, long partition) {
         Preconditions.checkArgument(count>0 && count< relationCountBound,"Invalid count for bound: %s", relationCountBound);
         return constructId(count, partition, null);
     }
 
-
+    //获取节点ID
     public long getVertexID(long count, long partition, VertexIDType vertexType) {
         Preconditions.checkArgument(VertexIDType.UserVertex.is(vertexType.suffix()),"Not a user vertex type: %s",vertexType);
         Preconditions.checkArgument(count>0 && count<vertexCountBound,"Invalid count for bound: %s", vertexCountBound);
@@ -522,6 +531,7 @@ public class IDManager {
         }
     }
 
+    //Hash操作后完成
     public long getPartitionHashForId(long id) {
         Preconditions.checkArgument(id>0);
         Preconditions.checkState(partitionBits>0, "no partition bits");
@@ -535,8 +545,9 @@ public class IDManager {
         return result;
     }
 
+    //获取标准化后的ID，需要通过分区来构建
     private long getCanonicalVertexIdFromCount(long count) {
-        long partition = getPartitionHashForId(count);
+        long partition = getPartitionHashForId(count);  //hash操作后定位分区数
         return constructId(count,partition,VertexIDType.PartitionedVertex);
     }
 
@@ -570,7 +581,7 @@ public class IDManager {
     /**
      * Converts a user provided long id into a JanusGraph vertex id. The id must be positive and less than {@link #getVertexCountBound()}.
      * This method is useful when providing ids during vertex creation via {@link org.apache.tinkerpop.gremlin.structure.Graph#addVertex(Object...)}.
-     *
+     * gremlin中的vertexId转换到janusGraph中的vertexId
      * @param id long id
      * @return a corresponding JanusGraph vertex id
      * @see #fromVertexId(long)
@@ -583,7 +594,7 @@ public class IDManager {
 
     /**
      * Converts a JanusGraph vertex id to the user provided id as the inverse mapping of {@link #toVertexId(long)}.
-     *
+     * 从janusGraph的vertexId转换成gremlin中的vertexId
      * @param id JanusGraph vertex id (must be positive)
      * @return original user provided id
      * @see #toVertexId(long)
@@ -657,6 +668,7 @@ public class IDManager {
                 || VertexIDType.UserPropertyKey.is(id) || VertexIDType.SystemPropertyKey.is(id);
     }
 
+    //去除RelationTyePadding的bit位
     public static long stripEntireRelationTypePadding(long id) {
         Preconditions.checkArgument(isProperRelationType(id));
         return VertexIDType.UserEdgeLabel.removePadding(id);

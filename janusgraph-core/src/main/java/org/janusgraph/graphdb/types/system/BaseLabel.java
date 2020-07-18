@@ -24,6 +24,7 @@ import org.janusgraph.graphdb.internal.JanusGraphSchemaCategory;
 import java.util.ArrayList;
 import java.util.Collection;
 
+//标识Label
 public class BaseLabel extends BaseRelationType implements EdgeLabel {
 
     public static final BaseLabel SchemaDefinitionEdge =

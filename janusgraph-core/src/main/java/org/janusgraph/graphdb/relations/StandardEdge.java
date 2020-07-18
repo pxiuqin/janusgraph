@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 实现标准边操作
  * @author Matthias Broecheler (me@matthiasb.com)
  */
 
@@ -38,12 +39,13 @@ public class StandardEdge extends AbstractEdge implements StandardRelation, Reas
     private long previousID = 0;
     private volatile Map<PropertyKey, Object> properties = EMPTY_PROPERTIES;
 
+    //id，label，start-vertex，end-vertex
     public StandardEdge(long id, EdgeLabel label, InternalVertex start, InternalVertex end, byte lifecycle) {
         super(id, label, start, end);
         this.lifecycle = lifecycle;
     }
 
-    //############## SAME CODE AS StandardProperty #############################
+    //############## SAME CODE AS StandardVertexProperty #############################
 
     @Override
     public long getPreviousID() {

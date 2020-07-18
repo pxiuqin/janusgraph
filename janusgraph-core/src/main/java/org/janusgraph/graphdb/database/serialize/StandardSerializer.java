@@ -67,7 +67,7 @@ public class StandardSerializer implements AttributeHandler, Serializer {
     private static final int MAX_REGISTRATION_NO = 100000;
 
 
-    private final BiMap<Integer,Class> registrations;
+    private final BiMap<Integer,Class> registrations;  //注冊各数据类型序列化器
     private final Map<Class,AttributeSerializer> handlers;
 
     public StandardSerializer() {
@@ -287,6 +287,7 @@ public class StandardSerializer implements AttributeHandler, Serializer {
         //Nothing to close
     }
 
+    //标准化输出实现
     private class StandardDataOutput extends WriteByteBuffer implements DataOutput {
 
         private StandardDataOutput(int initialCapacity) {

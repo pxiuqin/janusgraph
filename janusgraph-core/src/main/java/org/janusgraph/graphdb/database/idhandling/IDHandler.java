@@ -27,6 +27,7 @@ import org.apache.tinkerpop.gremlin.structure.Direction;
 import static org.janusgraph.graphdb.idmanagement.IDManager.VertexIDType.*;
 
 /**
+ * ID编码操作，主要完成ID的生成，VertexID，EdgeID，PropertyID
  * @author Matthias Broecheler (me@matthiasb.com)
  */
 
@@ -35,6 +36,7 @@ public class IDHandler {
     public static final StaticBuffer MIN_KEY = BufferUtil.getLongBuffer(0);
     public static final StaticBuffer MAX_KEY = BufferUtil.getLongBuffer(-1);
 
+    //方向编码
     public enum DirectionID {
 
         PROPERTY_DIR(0),  //00b
@@ -117,7 +119,7 @@ public class IDHandler {
     public static void writeRelationType(WriteBuffer out, long relationTypeId, DirectionID dirID, boolean invisible) {
         assert relationTypeId > 0 && (relationTypeId << 1) > 0; //Check positive and no-overflow
 
-        long strippedId = (IDManager.stripEntireRelationTypePadding(relationTypeId) << 1) + dirID.getDirectionInt();
+        long strippedId = (IDManager.stripEntireRelationTypePadding(relationTypeId) << 1) + dirID.getDirectionInt();  //
         VariableLong.writePositiveWithPrefix(out, strippedId, dirID.getPrefix(invisible, IDManager.isSystemRelationTypeId(relationTypeId)), PREFIX_BIT_LEN);
     }
 
@@ -127,8 +129,9 @@ public class IDHandler {
         return b.getStaticBuffer();
     }
 
+    //解析原输入流中的关系类型
     public static RelationTypeParse readRelationType(ReadBuffer in) {
-        long[] countPrefix = VariableLong.readPositiveWithPrefix(in, PREFIX_BIT_LEN);
+        long[] countPrefix = VariableLong.readPositiveWithPrefix(in, PREFIX_BIT_LEN);  //
         DirectionID dirID = DirectionID.getDirectionID((int) countPrefix[1] & 1, (int) (countPrefix[0] & 1));
         long typeId = countPrefix[0] >>> 1;
         boolean isSystemType = (countPrefix[1]>>1)==0;

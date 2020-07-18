@@ -37,6 +37,7 @@ public class StandardVertexProperty extends AbstractVertexProperty implements St
     private long previousID = 0;
     private volatile Map<PropertyKey, Object> properties = EMPTY_PROPERTIES;
 
+    //id，label，vertex，property-value
     public StandardVertexProperty(long id, PropertyKey type, InternalVertex vertex, Object value, byte lifecycle) {
         super(id, type, vertex, value);
         this.lifecycle = lifecycle;

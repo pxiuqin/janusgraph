@@ -29,6 +29,7 @@ import java.lang.reflect.Modifier;
 import static org.janusgraph.graphdb.types.TypeDefinitionCategory.DATATYPE;
 
 /**
+ *
  * @author Matthias Broecheler (me@matthiasb.com)
  */
 

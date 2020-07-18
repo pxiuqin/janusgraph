@@ -21,6 +21,7 @@ import org.janusgraph.graphdb.internal.JanusGraphSchemaCategory;
 import org.janusgraph.graphdb.internal.Token;
 import org.apache.commons.lang.StringUtils;
 
+//
 public abstract class BaseRelationType extends EmptyRelationType implements SystemRelationType {
 
     private final String name;
@@ -68,9 +69,9 @@ public abstract class BaseRelationType extends EmptyRelationType implements Syst
         Preconditions.checkArgument(id > 0);
         Preconditions.checkArgument(type.isRelationType());
         switch (type) {
-            case EDGELABEL:
+            case EDGELABEL:  //标识关系
                 return IDManager.getSchemaId(IDManager.VertexIDType.SystemEdgeLabel, id);
-            case PROPERTYKEY:
+            case PROPERTYKEY:  //表示属性
                 return IDManager.getSchemaId(IDManager.VertexIDType.SystemPropertyKey,id);
             default:
                 throw new AssertionError("Illegal argument: " + type);

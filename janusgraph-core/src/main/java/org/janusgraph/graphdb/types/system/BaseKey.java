@@ -32,9 +32,10 @@ import org.apache.tinkerpop.gremlin.structure.Direction;
 
 import java.util.Collections;
 
+//标识的是属性信息
 public class BaseKey extends BaseRelationType implements PropertyKey {
 
-    private enum Index { NONE, STANDARD, UNIQUE }
+    private enum Index { NONE, STANDARD, UNIQUE }  //标识索引方式
 
     //We rely on the vertex-existence property to be the smallest (in byte-order) when iterating over the entire graph
     public static final BaseKey VertexExists =

@@ -22,7 +22,7 @@ import org.janusgraph.core.schema.SchemaStatus;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 
 /**
- * Internal Type interface adding methods that should only be used by JanusGraph
+ * Internal Type interface adding methods that should only be used by JanusGraph【关系类型的内部接口】
  *
  * @author Matthias Broecheler (me@matthiasb.com)
  */

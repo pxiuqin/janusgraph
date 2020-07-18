@@ -50,6 +50,7 @@ import static org.janusgraph.graphdb.database.idhandling.IDHandler.RelationTypeP
 import static org.janusgraph.graphdb.database.idhandling.IDHandler.getBounds;
 
 /**
+ * 边序列化操作
  * @author Matthias Broecheler (me@matthiasb.com)
  */
 
@@ -67,6 +68,7 @@ public class EdgeSerializer implements RelationReader {
         this.serializer = serializer;
     }
 
+    //读取数据到缓存中
     public RelationCache readRelation(Entry data, boolean parseHeaderOnly, TypeInspector tx) {
         RelationCache map = data.getCache();
         if (map == null || !(parseHeaderOnly || map.hasProperties())) {
@@ -82,6 +84,7 @@ public class EdgeSerializer implements RelationReader {
         return IDHandler.readRelationType(data.asReadBuffer()).dirID.getDirection();
     }
 
+    //基于编码方式来进行关系转换
     @Override
     public RelationCache parseRelation(Entry data, boolean excludeProperties, TypeInspector tx) {
         ReadBuffer in = data.asReadBuffer();
@@ -236,19 +239,19 @@ public class EdgeSerializer implements RelationReader {
         return writeRelation(relation, (InternalRelationType) relation.getType(), position, tx);
     }
 
-    //写入关系
+    //写入关系，关系数据包装成一个Entry
     public StaticArrayEntry writeRelation(InternalRelation relation, InternalRelationType type, int position,
                                           TypeInspector tx) {
         assert type==relation.getType() || (type.getBaseType() != null
                 && type.getBaseType().equals(relation.getType()));
         Direction dir = EdgeDirection.fromPosition(position);
         Preconditions.checkArgument(type.isUnidirected(Direction.BOTH) || type.isUnidirected(dir));
-        long typeId = type.longId();  //类型ID
+        long typeId = type.longId();  //类型ID【是按照比特位来区分的】
         DirectionID dirID = getDirID(dir, relation.isProperty() ? RelationCategory.PROPERTY : RelationCategory.EDGE);
 
-        DataOutput out = serializer.getDataOutput(DEFAULT_CAPACITY);
+        DataOutput out = serializer.getDataOutput(DEFAULT_CAPACITY);  //按照实际serilizer序列化，默认是StandardSerializer
         int valuePosition;
-        IDHandler.writeRelationType(out, typeId, dirID, type.isInvisibleType());
+        IDHandler.writeRelationType(out, typeId, dirID, type.isInvisibleType());   //写入边，这里会调用相关序列化实现
         Multiplicity multiplicity = type.multiplicity();
 
         long[] sortKey = type.getSortKey();

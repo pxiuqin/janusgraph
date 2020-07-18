@@ -79,7 +79,7 @@ public abstract class AbstractEdge extends AbstractTypedRelation implements Janu
     @Override
     public int getArity() {
         return 2;
-    }
+    }  //表示是边所以为两个节点
 
     @Override
     public int getLen() {

@@ -20,6 +20,7 @@ import org.janusgraph.diskstorage.WriteBuffer;
 import org.janusgraph.graphdb.database.idhandling.VariableLong;
 import org.janusgraph.graphdb.database.serialize.OrderPreservingSerializer;
 
+//枚举类型的序列化操作类
 public class EnumSerializer<E extends Enum> implements OrderPreservingSerializer<E>  {
 
     private static final long serialVersionUID = 117423419862504186L;

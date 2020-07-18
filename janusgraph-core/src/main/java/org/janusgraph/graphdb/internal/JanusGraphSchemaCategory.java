@@ -52,7 +52,7 @@ public enum JanusGraphSchemaCategory {
         switch(this) {
             case EDGELABEL:
             case PROPERTYKEY:
-                prefix = "rt";
+                prefix = "rt";  //边和属性作为一种标识
                 break;
             case GRAPHINDEX:
                 prefix = "gi";

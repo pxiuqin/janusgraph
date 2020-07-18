@@ -18,7 +18,7 @@ import org.janusgraph.core.PropertyKey;
 import org.janusgraph.core.JanusGraphRelation;
 
 /**
- * Internal Relation interface adding methods that should only be used by JanusGraph.
+ * Internal Relation interface adding methods that should only be used by JanusGraph.【关系操作的接口定义】
  *
  * The "direct" qualifier in the method names indicates that the corresponding action is executed on this relation
  * object and not migrated to a different transactional context. It also means that access returns the "raw" value of
@@ -55,7 +55,7 @@ public interface InternalRelation extends JanusGraphRelation, InternalElement {
      * differ from {@link #getArity()}
      *
      */
-    int getLen();
+    int getLen();  //实现可以考虑方向的不同节点数不同
 
 
 

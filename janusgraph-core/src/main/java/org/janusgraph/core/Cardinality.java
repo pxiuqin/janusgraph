@@ -19,25 +19,25 @@ package org.janusgraph.core;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 
 /**
- * The cardinality of the values associated with given key for a particular element.
+ * The cardinality of the values associated with given key for a particular element.【属性是一个什么类型】
  *
 * @author Matthias Broecheler (me@matthiasb.com)
 */
 public enum Cardinality {
 
     /**
-     * Only a single value may be associated with the given key.
+     * Only a single value may be associated with the given key.【单独key-value】
      */
     SINGLE,
 
     /**
-     * Multiple values and duplicate values may be associated with the given key.
+     * Multiple values and duplicate values may be associated with the given key.【属性key中对用多个value且可以重复】
      */
     LIST,
 
 
     /**
-     * Multiple but distinct values may be associated with the given key.
+     * Multiple but distinct values may be associated with the given key.【属性key中对用多个value且不能重复】
      */
     SET;
 

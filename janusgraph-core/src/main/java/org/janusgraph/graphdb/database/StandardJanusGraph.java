@@ -157,8 +157,8 @@ public class StandardJanusGraph extends JanusGraphBlueprintsGraph {
         this.idAssigner = config.getIDAssigner(backend);
         this.idManager = idAssigner.getIDManager();
 
-        this.serializer = config.getSerializer();
-        StoreFeatures storeFeatures = backend.getStoreFeatures();
+        this.serializer = config.getSerializer();  //配置给定了StandardSerializer
+        StoreFeatures storeFeatures = backend.getStoreFeatures();  //存储特性
         this.indexSerializer = new IndexSerializer(configuration.getConfiguration(), this.serializer,
                 this.backend.getIndexInformation(), storeFeatures.isDistributed() && storeFeatures.isKeyOrdered());
         this.edgeSerializer = new EdgeSerializer(this.serializer);

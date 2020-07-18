@@ -1389,8 +1389,9 @@ public class GraphDatabaseConfiguration {
         return getSerializer(configuration);
     }
 
+    //基于配置文件获取序列化方式
     public static Serializer getSerializer(Configuration configuration) {
-        Serializer serializer = new StandardSerializer();
+        Serializer serializer = new StandardSerializer();  //构建标准的序列化器
 
         List<RegisteredAttributeClass<?>> registeredAttributeClasses =
             RegisteredAttributeClassesConverter.getInstance().convert(configuration);

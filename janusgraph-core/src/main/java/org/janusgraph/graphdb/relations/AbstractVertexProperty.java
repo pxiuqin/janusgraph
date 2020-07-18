@@ -67,7 +67,7 @@ public abstract class AbstractVertexProperty<V> extends AbstractTypedRelation im
     @Override
     public final int getArity() {
         return 1;
-    }
+    }  //属性对应的就是一个节点
 
     @Override
     public final int getLen() {
