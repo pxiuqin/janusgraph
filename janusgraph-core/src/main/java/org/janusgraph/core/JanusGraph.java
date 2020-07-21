@@ -20,7 +20,7 @@ import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.util.Gremlin;
 
 /**
- * JanusGraph graph database implementation of the Blueprint's interface.
+ * JanusGraph graph database implementation of the Blueprint's interface.【JanusGraph接口】
  * Use {@link JanusGraphFactory} to open and configure JanusGraph instances.
  *
  * @author Matthias Br&ouml;cheler (http://www.matthiasb.com)

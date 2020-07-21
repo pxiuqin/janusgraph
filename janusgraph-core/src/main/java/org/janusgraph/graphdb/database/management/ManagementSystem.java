@@ -660,6 +660,7 @@ public class ManagementSystem implements JanusGraphManagement {
         if (!key.isNew()) updateIndex(index, SchemaAction.REGISTER_INDEX);
     }
 
+    //创建复合索引
     private JanusGraphIndex createCompositeIndex(String indexName, ElementCategory elementCategory, boolean unique, JanusGraphSchemaType constraint, PropertyKey... keys) {
         checkIndexName(indexName);
         Preconditions.checkArgument(keys != null && keys.length > 0, "Need to provide keys to index [%s]", indexName);
@@ -707,6 +708,7 @@ public class ManagementSystem implements JanusGraphManagement {
         return new IndexBuilder(indexName, ElementCategory.getByClazz(elementType));
     }
 
+    //实现一个索引构建
     private class IndexBuilder implements JanusGraphManagement.IndexBuilder {
 
         private final String indexName;
@@ -748,6 +750,7 @@ public class ManagementSystem implements JanusGraphManagement {
             return this;
         }
 
+        //构建复合索引
         @Override
         public JanusGraphIndex buildCompositeIndex() {
             Preconditions.checkArgument(!keys.isEmpty(), "Need to specify at least one key for the composite index");
@@ -760,6 +763,7 @@ public class ManagementSystem implements JanusGraphManagement {
             return createCompositeIndex(indexName, elementCategory, unique, constraint, keyArr);
         }
 
+        //构建混合索引
         @Override
         public JanusGraphIndex buildMixedIndex(String backingIndex) {
             Preconditions.checkArgument(StringUtils.isNotBlank(backingIndex), "Need to specify backing index name");

@@ -30,7 +30,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
- * The JanusGraphManagement interface provides methods to define, update, and inspect the schema of a JanusGraph graph.
+ * The JanusGraphManagement interface provides methods to define, update, and inspect the schema of a JanusGraph graph.【图的Schema操作管理】
  * It wraps a {@link JanusGraphTransaction} and therefore copies many of its methods as they relate to schema inspection
  * and definition.
  * <p>
@@ -217,7 +217,7 @@ public interface JanusGraphManagement extends JanusGraphConfiguration, SchemaMan
         IndexBuilder unique();
 
         /**
-         * Builds a composite index according to the specification
+         * Builds a composite index according to the specification【合成索引】
          *
          * @return the created composite {@link JanusGraphIndex}
          */
@@ -225,7 +225,7 @@ public interface JanusGraphManagement extends JanusGraphConfiguration, SchemaMan
 
         /**
          * Builds a mixed index according to the specification against the backend index with the given name (i.e.
-         * the name under which that index is configured in the graph configuration)
+         * the name under which that index is configured in the graph configuration)【配置文件中获取的相关索引的方式】
          *
          * @param backingIndex the name of the mixed index
          * @return the created mixed {@link JanusGraphIndex}

@@ -33,7 +33,7 @@ import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 /**
- * Example Graph factory that creates a {@link JanusGraph} based on roman mythology.
+ * Example Graph factory that creates a {@link JanusGraph} based on roman mythology.【初始化给定一个示例数据】
  * Used in the documentation examples and tutorials.
  *
  * @author Marko A. Rodriguez (https://markorodriguez.com)
@@ -69,23 +69,25 @@ public class GraphOfTheGodsFactory {
         return indexName == null || graph.getIndexSerializer().containsIndex(indexName);
     }
 
+    //加载一个图实例
     public static void load(final JanusGraph graph, String mixedIndexName, boolean uniqueNameCompositeIndex) {
+        //确定为标准Janus图
         if (graph instanceof StandardJanusGraph) {
             Preconditions.checkState(mixedIndexNullOrExists((StandardJanusGraph)graph, mixedIndexName), 
                     ERR_NO_INDEXING_BACKEND, mixedIndexName);
         }
 
         //Create Schema
-        JanusGraphManagement management = graph.openManagement();
-        final PropertyKey name = management.makePropertyKey("name").dataType(String.class).make();
-        JanusGraphManagement.IndexBuilder nameIndexBuilder = management.buildIndex("name", Vertex.class).addKey(name);
+        JanusGraphManagement management = graph.openManagement();  //实例化图管理
+        final PropertyKey name = management.makePropertyKey("name").dataType(String.class).make();  //创建name属性
+        JanusGraphManagement.IndexBuilder nameIndexBuilder = management.buildIndex("name", Vertex.class).addKey(name);  //基于name的索引
         if (uniqueNameCompositeIndex)
             nameIndexBuilder.unique();
-        JanusGraphIndex nameIndex = nameIndexBuilder.buildCompositeIndex();
-        management.setConsistency(nameIndex, ConsistencyModifier.LOCK);
-        final PropertyKey age = management.makePropertyKey("age").dataType(Integer.class).make();
-        if (null != mixedIndexName)
-            management.buildIndex("vertices", Vertex.class).addKey(age).buildMixedIndex(mixedIndexName);
+        JanusGraphIndex nameIndex = nameIndexBuilder.buildCompositeIndex();  //构建复合索引
+        management.setConsistency(nameIndex, ConsistencyModifier.LOCK);  //设置一致性
+        final PropertyKey age = management.makePropertyKey("age").dataType(Integer.class).make();  //设置age的索引
+        if (null != mixedIndexName)  //索引方式
+            management.buildIndex("vertices", Vertex.class).addKey(age).buildMixedIndex(mixedIndexName);  //构建索引
 
         final PropertyKey time = management.makePropertyKey("time").dataType(Integer.class).make();
         final PropertyKey reason = management.makePropertyKey("reason").dataType(String.class).make();
@@ -111,7 +113,8 @@ public class GraphOfTheGodsFactory {
         management.commit();
 
         JanusGraphTransaction tx = graph.newTransaction();
-        // vertices
+
+        // vertices【构建节点信息】
 
         Vertex saturn = tx.addVertex(T.label, "titan", "name", "saturn", "age", 10000);
         Vertex sky = tx.addVertex(T.label, "location", "name", "sky");
@@ -126,7 +129,7 @@ public class GraphOfTheGodsFactory {
         Vertex cerberus = tx.addVertex(T.label, "monster", "name", "cerberus");
         Vertex tartarus = tx.addVertex(T.label, "location", "name", "tartarus");
 
-        // edges
+        // edges【构建边信息】
 
         jupiter.addEdge("father", saturn);
         jupiter.addEdge("lives", sky, "reason", "loves fresh breezes");

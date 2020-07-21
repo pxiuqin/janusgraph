@@ -30,28 +30,29 @@ import org.janusgraph.graphdb.database.idhandling.VariableLong;
 public class IDManager {
 
     /**
+     * 整体对KCV结构中K的处理方式，如果进行区分不同的Key
      *bit mask- Description (+ indicates defined type, * indicates proper &amp; defined type)【这里标识的是Padding位置的数据，也就是ID尾部的编码】
      *
      *      0 - + User created Vertex
-     *    000 -     * Normal vertices
+     *    000 -     * Normal vertices                         0X------0
      *    010 -     * Partitioned vertices
-     *    100 -     * Unmodifiable (e.g. TTL'ed) vertices
+     *    100 -     * Unmodifiable (e.g. TTL'ed) vertices     0X------4
      *    110 -     + Reserved for additional vertex type
      *      1 - + Invisible
-     *     11 -     * Invisible (user created/triggered) Vertex [for later]
+     *     11 -     * Invisible (user created/triggered) Vertex [for later]   0X------3
      *     01 -     + Schema related vertices
      *    101 -         + Schema Type vertices
      *   0101 -             + Relation Type vertices
      *  00101 -                 + Property Key
-     * 000101 -                     * User Property Key
+     * 000101 -                     * User Property Key   0X----05
      * 100101 -                     * System Property Key
      *  10101 -                 + Edge Label
-     * 010101 -                     * User Edge Label
+     * 010101 -                     * User Edge Label     0X----15
      * 110101 -                     * System Edge Label
      *   1101 -             Other Type vertices
-     *  01101 -                 * Vertex Label
+     *  01101 -                 * Vertex Label            0X----0d
      *    001 -         Non-Type vertices
-     *   1001 -             * Generic Schema Vertex
+     *   1001 -             * Generic Schema Vertex       0X----09
      *   0001 -             Reserved for future
      *
      *
