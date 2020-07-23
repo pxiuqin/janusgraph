@@ -81,19 +81,19 @@ public class GraphOfTheGodsFactory {
         JanusGraphManagement management = graph.openManagement();  //实例化图管理
         final PropertyKey name = management.makePropertyKey("name").dataType(String.class).make();  //创建name属性
         JanusGraphManagement.IndexBuilder nameIndexBuilder = management.buildIndex("name", Vertex.class).addKey(name);  //基于name的索引
-        if (uniqueNameCompositeIndex)
+        if (uniqueNameCompositeIndex)  //基于配置确定索引是否唯一性
             nameIndexBuilder.unique();
         JanusGraphIndex nameIndex = nameIndexBuilder.buildCompositeIndex();  //构建复合索引
         management.setConsistency(nameIndex, ConsistencyModifier.LOCK);  //设置一致性
         final PropertyKey age = management.makePropertyKey("age").dataType(Integer.class).make();  //设置age的索引
-        if (null != mixedIndexName)  //索引方式
-            management.buildIndex("vertices", Vertex.class).addKey(age).buildMixedIndex(mixedIndexName);  //构建索引
+        if (null != mixedIndexName)  //索引方式【配置文件中传递】
+            management.buildIndex("vertices", Vertex.class).addKey(age).buildMixedIndex(mixedIndexName);  //构建全文索引
 
-        final PropertyKey time = management.makePropertyKey("time").dataType(Integer.class).make();
+        final PropertyKey time = management.makePropertyKey("time").dataType(Integer.class).make();   //构建时间属性
         final PropertyKey reason = management.makePropertyKey("reason").dataType(String.class).make();
-        final PropertyKey place = management.makePropertyKey("place").dataType(Geoshape.class).make();
+        final PropertyKey place = management.makePropertyKey("place").dataType(Geoshape.class).make();  //地理对象类
         if (null != mixedIndexName)
-            management.buildIndex("edges", Edge.class).addKey(reason).addKey(place).buildMixedIndex(mixedIndexName);
+            management.buildIndex("edges", Edge.class).addKey(reason).addKey(place).buildMixedIndex(mixedIndexName);  //构建了全文索引
 
         management.makeEdgeLabel("father").multiplicity(Multiplicity.MANY2ONE).make();
         management.makeEdgeLabel("mother").multiplicity(Multiplicity.MANY2ONE).make();
@@ -116,7 +116,7 @@ public class GraphOfTheGodsFactory {
 
         // vertices【构建节点信息】
 
-        Vertex saturn = tx.addVertex(T.label, "titan", "name", "saturn", "age", 10000);
+        Vertex saturn = tx.addVertex(T.label, "titan", "name", "saturn", "age", 10000);  //相当于kv
         Vertex sky = tx.addVertex(T.label, "location", "name", "sky");
         Vertex sea = tx.addVertex(T.label, "location", "name", "sea");
         Vertex jupiter = tx.addVertex(T.label, "god", "name", "jupiter", "age", 5000);

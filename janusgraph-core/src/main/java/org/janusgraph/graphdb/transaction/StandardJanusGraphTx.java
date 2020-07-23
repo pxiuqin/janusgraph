@@ -515,6 +515,8 @@ public class StandardJanusGraphTx extends JanusGraphBlueprintsTransaction implem
         Preconditions.checkArgument(vertexId == null || IDManager.VertexIDType.NormalVertex.is(vertexId), "Not a valid vertex id: %s", vertexId);
         Preconditions.checkArgument(vertexId == null || ((InternalVertexLabel)label).hasDefaultConfiguration(), "Cannot only use default vertex labels: %s",label);
         Preconditions.checkArgument(vertexId == null || !config.hasVerifyExternalVertexExistence() || !containsVertex(vertexId), "Vertex with given id already exists: %s", vertexId);
+
+        //构建一个标准的节点
         StandardVertex vertex = new StandardVertex(this, IDManager.getTemporaryVertexID(IDManager.VertexIDType.NormalVertex, temporaryIds.nextID()), ElementLifeCycle.New);
         if (vertexId != null) {
             vertex.setId(vertexId);  //创建一个新的节点
@@ -1083,6 +1085,7 @@ public class StandardJanusGraphTx extends JanusGraphBlueprintsTransaction implem
         return (VertexLabel)getSchemaVertex(JanusGraphSchemaCategory.VERTEXLABEL.getSchemaName(name));
     }
 
+    //基于名称创建节点类型
     @Override
     public VertexLabel getOrCreateVertexLabel(String name) {
         VertexLabel vertexLabel = getVertexLabel(name);

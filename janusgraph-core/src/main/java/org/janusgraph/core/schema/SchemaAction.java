@@ -17,6 +17,7 @@ package org.janusgraph.core.schema;
 import java.util.*;
 
 /**
+ * Schema动作，索引操作
  * Update actions to be executed through {@link JanusGraphManagement} in {@link JanusGraphManagement#updateIndex(Index, SchemaAction)}.
  *
  * @author Matthias Broecheler (me@matthiasb.com)

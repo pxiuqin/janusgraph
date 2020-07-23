@@ -214,7 +214,7 @@ public interface JanusGraphManagement extends JanusGraphConfiguration, SchemaMan
          *
          * @return this IndexBuilder
          */
-        IndexBuilder unique();
+        IndexBuilder unique();  //唯一性索引
 
         /**
          * Builds a composite index according to the specification【合成索引】

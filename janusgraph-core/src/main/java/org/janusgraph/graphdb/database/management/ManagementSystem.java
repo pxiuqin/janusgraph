@@ -269,6 +269,7 @@ public class ManagementSystem implements JanusGraphManagement {
         return buildRelationTypeIndex(key, name, Direction.OUT, Order.convert(sortOrder), sortKeys);
     }
 
+    //创建Relation索引
     private RelationTypeIndex buildRelationTypeIndex(RelationType type, String name, Direction direction, Order sortOrder, PropertyKey... sortKeys) {
         Preconditions.checkArgument(type != null && direction != null && sortOrder != null && sortKeys != null);
         Preconditions.checkArgument(StringUtils.isNotBlank(name), "Name cannot be blank: %s", name);
@@ -283,13 +284,13 @@ public class ManagementSystem implements JanusGraphManagement {
         String composedName = composeRelationTypeIndexName(type, name);
         StandardRelationTypeMaker maker;
         if (type.isEdgeLabel()) {
-            StandardEdgeLabelMaker lm = (StandardEdgeLabelMaker) transaction.makeEdgeLabel(composedName);
+            StandardEdgeLabelMaker lm = (StandardEdgeLabelMaker) transaction.makeEdgeLabel(composedName);   //创建边
             lm.unidirected(direction);
             maker = lm;
         } else {
             assert type.isPropertyKey();
             assert direction == Direction.OUT;
-            StandardPropertyKeyMaker lm = (StandardPropertyKeyMaker) transaction.makePropertyKey(composedName);
+            StandardPropertyKeyMaker lm = (StandardPropertyKeyMaker) transaction.makePropertyKey(composedName);  //创建属性
             lm.dataType(((PropertyKey) type).dataType());
             maker = lm;
         }
@@ -325,7 +326,7 @@ public class ManagementSystem implements JanusGraphManagement {
     }
 
     private static String composeRelationTypeIndexName(RelationType type, String name) {
-        return String.valueOf(type.longId()) + RELATION_INDEX_SEPARATOR + name;
+        return String.valueOf(type.longId()) + RELATION_INDEX_SEPARATOR + name;  //凭借索引名
     }
 
     @Override
@@ -713,7 +714,7 @@ public class ManagementSystem implements JanusGraphManagement {
 
         private final String indexName;
         private final ElementCategory elementCategory;
-        private boolean unique = false;
+        private boolean unique = false;  //标识索引是否唯一
         private JanusGraphSchemaType constraint = null;
         private final Map<PropertyKey, Parameter[]> keys = new HashMap<>();
 
@@ -820,6 +821,8 @@ public class ManagementSystem implements JanusGraphManagement {
         IndexIdentifier indexId = new IndexIdentifier(index);
         StandardScanner.Builder builder;
         IndexJobFuture future;
+
+        //基于索引不同的更新方式处理索引
         switch (updateAction) {
             case REGISTER_INDEX:
                 setStatus(schemaVertex, SchemaStatus.INSTALLED, keySubset);

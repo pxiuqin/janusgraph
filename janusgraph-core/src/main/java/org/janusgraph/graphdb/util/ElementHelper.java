@@ -76,7 +76,7 @@ public class ElementHelper {
             throw Graph.Exceptions.argumentCanNotBeNull("vertex");
 
         for (int i = 0; i < propertyKeyValues.length; i = i + 2) {
-            if (!propertyKeyValues[i].equals(T.id) && !propertyKeyValues[i].equals(T.label))
+            if (!propertyKeyValues[i].equals(T.id) && !propertyKeyValues[i].equals(T.label))  //去掉id和label
                 vertex.property((String) propertyKeyValues[i], propertyKeyValues[i + 1]);
         }
     }

@@ -291,11 +291,12 @@ public class JanusGraphFactory {
     //          HELPER METHODS
     //###################################
 
+    //读取配置文件
     private static ReadConfiguration getLocalConfiguration(String shortcutOrFile) {
         File file = new File(shortcutOrFile);
-        if (file.exists()) return getLocalConfiguration(file);
+        if (file.exists()) return getLocalConfiguration(file);  //如果存在直接读取
         else {
-            int pos = shortcutOrFile.indexOf(':');
+            int pos = shortcutOrFile.indexOf(':');  //可能是由多个文件组成
             if (pos<0) pos = shortcutOrFile.length();
             String backend = shortcutOrFile.substring(0,pos);
             Preconditions.checkArgument(StandardStoreManager.getAllManagerClasses().containsKey(backend.toLowerCase()), "Backend shorthand unknown: %s", backend);

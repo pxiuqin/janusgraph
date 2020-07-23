@@ -104,9 +104,11 @@ public abstract class JanusGraphBlueprintsTransaction implements JanusGraphTrans
         ElementHelper.legalPropertyKeyValueArray(keyValues);
         if (ElementHelper.getIdValue(keyValues).isPresent() && !((StandardJanusGraph) getGraph()).getConfiguration().allowVertexIdSetting()) throw Vertex.Exceptions.userSuppliedIdsNotSupported();
         Object labelValue = null;
-        for (int i = 0; i < keyValues.length; i = i + 2) {
-            if (keyValues[i].equals(T.label)) {
-                labelValue = keyValues[i+1];
+
+        //获取了节点Label
+        for (int i = 0; i < keyValues.length; i = i + 2) {  //每次读取kv
+            if (keyValues[i].equals(T.label)) {  //是否Label
+                labelValue = keyValues[i+1];  //获取Label值
                 Preconditions.checkArgument(labelValue instanceof VertexLabel || labelValue instanceof String,
                         "Expected a string or VertexLabel as the vertex label argument, but got: %s",labelValue);
                 if (labelValue instanceof String) ElementHelper.validateLabel((String) labelValue);
@@ -117,9 +119,9 @@ public abstract class JanusGraphBlueprintsTransaction implements JanusGraphTrans
             label = (labelValue instanceof VertexLabel)?(VertexLabel)labelValue:getOrCreateVertexLabel((String) labelValue);
         }
 
-        final Long id = ElementHelper.getIdValue(keyValues).map(Number.class::cast).map(Number::longValue).orElse(null);
+        final Long id = ElementHelper.getIdValue(keyValues).map(Number.class::cast).map(Number::longValue).orElse(null);  //生成节点ID
         final JanusGraphVertex vertex = addVertex(id, label);
-        org.janusgraph.graphdb.util.ElementHelper.attachProperties(vertex, keyValues);
+        org.janusgraph.graphdb.util.ElementHelper.attachProperties(vertex, keyValues);  //添加节点属性
         return vertex;
     }
 
