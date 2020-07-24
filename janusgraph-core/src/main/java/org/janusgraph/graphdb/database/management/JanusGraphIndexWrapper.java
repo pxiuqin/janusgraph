@@ -29,6 +29,7 @@ import org.apache.tinkerpop.gremlin.structure.Element;
 import java.util.Objects;
 
 /**
+ * 索引包装器
  * @author Matthias Broecheler (me@matthiasb.com)
  */
 public class JanusGraphIndexWrapper implements JanusGraphIndex {

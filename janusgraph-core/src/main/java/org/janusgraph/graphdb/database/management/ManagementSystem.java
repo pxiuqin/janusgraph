@@ -825,7 +825,7 @@ public class ManagementSystem implements JanusGraphManagement {
         //基于索引不同的更新方式处理索引
         switch (updateAction) {
             case REGISTER_INDEX:
-                setStatus(schemaVertex, SchemaStatus.INSTALLED, keySubset);
+                setStatus(schemaVertex, SchemaStatus.INSTALLED, keySubset);  //先更新Schema的状态
                 updatedTypes.add(schemaVertex);
                 updatedTypes.addAll(dependentTypes);
                 setUpdateTrigger(new UpdateStatusTrigger(graph, schemaVertex, SchemaStatus.REGISTERED, keySubset));
@@ -1014,6 +1014,7 @@ public class ManagementSystem implements JanusGraphManagement {
         updatedTypeTriggers.add(trigger);
     }
 
+    //更新Schema状态
     private void setStatus(JanusGraphSchemaVertex vertex, SchemaStatus status, Set<PropertyKeyVertex> keys) {
         if (keys.isEmpty()) setStatusVertex(vertex, status);
         else setStatusEdges(vertex, status, keys);

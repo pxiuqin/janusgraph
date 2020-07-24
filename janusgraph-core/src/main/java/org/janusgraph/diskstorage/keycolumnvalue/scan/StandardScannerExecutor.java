@@ -35,6 +35,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
+ * 标准Scanner执行线程
  * @author Matthias Broecheler (me@matthiasb.com)
  */
 class StandardScannerExecutor extends AbstractFuture<ScanMetrics> implements JanusGraphManagement.IndexJobFuture, Runnable {
@@ -82,6 +83,7 @@ class StandardScannerExecutor extends AbstractFuture<ScanMetrics> implements Jan
         metrics = new StandardScanMetrics();
     }
 
+    //田间一个数据拉取线程
     private DataPuller addDataPuller(SliceQuery sq, StoreTransaction stx, int pos) throws BackendException {
         final BlockingQueue<SliceResult> queue = new LinkedBlockingQueue<>(
                 this.graphConfiguration.get(GraphDatabaseConfiguration.PAGE_SIZE));
@@ -107,15 +109,15 @@ class StandardScannerExecutor extends AbstractFuture<ScanMetrics> implements Jan
             if (numQueries > 1) {
                 //It is assumed that the first query is the grounding query if multiple queries exist
                 SliceQuery ground = queries.get(0);
-                StaticBuffer start = ground.getSliceStart();
+                StaticBuffer start = ground.getSliceStart();  //开始
                 Preconditions.checkArgument(start.equals(BufferUtil.zeroBuffer(1)),
                         "Expected start of first query to be a single 0s: %s",start);
-                StaticBuffer end = ground.getSliceEnd();
+                StaticBuffer end = ground.getSliceEnd(); //结束
                 Preconditions.checkArgument(end.equals(BufferUtil.oneBuffer(end.length())),
                         "Expected end of first query to be all 1s: %s",end);
             }
-            dataQueues = new ArrayList<>(numQueries);
-            pullThreads = new DataPuller[numQueries];
+            dataQueues = new ArrayList<>(numQueries);  //队列大小
+            pullThreads = new DataPuller[numQueries];  //拉取数据线程数
 
             for (int pos = 0; pos< numQueries; pos++) {
                 pullThreads[pos] = addDataPuller(queries.get(pos), storeTx, pos);
@@ -131,6 +133,7 @@ class StandardScannerExecutor extends AbstractFuture<ScanMetrics> implements Jan
         BlockingQueue<Row> processorQueue = new LinkedBlockingQueue<>(
                 this.graphConfiguration.get(GraphDatabaseConfiguration.PAGE_SIZE) * numProcessors * numQueries);
 
+        //数据处理线程启动
         Processor[] processors = new Processor[numProcessors];
         for (int i=0;i<processors.length;i++) {
             processors[i]= new Processor(job.clone(),processorQueue);
@@ -142,11 +145,11 @@ class StandardScannerExecutor extends AbstractFuture<ScanMetrics> implements Jan
             while (!interrupted) {
                 for (int i = 0; i < numQueries; i++) {
                     if (currentResults[i]!=null) continue;
-                    BlockingQueue<SliceResult> queue = dataQueues.get(i);
+                    BlockingQueue<SliceResult> queue = dataQueues.get(i); //读取数据结果队列
 
                     SliceResult qr = queue.poll(TIME_PER_TRY,TimeUnit.MILLISECONDS); //Try very short time to see if we are done
                     if (qr==null) {
-                        if (pullThreads[i].isFinished()) continue; //No more data to be expected
+                        if (pullThreads[i].isFinished()) continue; //No more data to be expected【】
                         while (!pullThreads[i].isFinished() && qr == null) {
                             qr = queue.poll(TIME_PER_TRY, TimeUnit.MILLISECONDS);
                         }
@@ -170,7 +173,7 @@ class StandardScannerExecutor extends AbstractFuture<ScanMetrics> implements Jan
                     }
                     queryResults.put(query,entries);
                 }
-                processorQueue.put(new Row(key, queryResults));
+                processorQueue.put(new Row(key, queryResults));    //给到处理队列
             }
 
             for (int i = 0; i < pullThreads.length; i++) {
@@ -187,7 +190,7 @@ class StandardScannerExecutor extends AbstractFuture<ScanMetrics> implements Jan
             }
 
             for (Processor processor : processors) {
-                processor.finish();
+                processor.finish();  //关闭处理线程
             }
             if (!Threads.waitForCompletion(processors,TIMEOUT_MS)) log.error("Processor did not terminate in time");
 
@@ -220,6 +223,7 @@ class StandardScannerExecutor extends AbstractFuture<ScanMetrics> implements Jan
         interrupted = true;
     }
 
+    //终端拉取数据线程
     private void cleanup() throws BackendException {
         if (!hasCompleted) {
             hasCompleted = true;
@@ -264,7 +268,7 @@ class StandardScannerExecutor extends AbstractFuture<ScanMetrics> implements Jan
     }
 
 
-
+    //处理线程
     private class Processor extends Thread {
 
         private ScanJob job;
@@ -343,7 +347,7 @@ class StandardScannerExecutor extends AbstractFuture<ScanMetrics> implements Jan
             try {
                 while (keyIterator.hasNext()) {
                     StaticBuffer key = keyIterator.next();
-                    RecordIterator<Entry> entries = keyIterator.getEntries();
+                    RecordIterator<Entry> entries = keyIterator.getEntries(); //获取与了Entry枚举器
                     if (!keyFilter.test(key)) continue;
                     EntryList entryList = EntryArrayList.of(entries);
                     queue.put(new SliceResult(query, key, entryList));
@@ -367,6 +371,7 @@ class StandardScannerExecutor extends AbstractFuture<ScanMetrics> implements Jan
         }
     }
 
+    //分片查询结果
     private static class SliceResult {
 
         final SliceQuery query;

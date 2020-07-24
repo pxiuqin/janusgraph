@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
+ * 基于节点中心的边迭代器
  * @author Matthias Broecheler (me@matthiasb.com)
  */
 
@@ -43,7 +44,7 @@ public class VertexCentricEdgeIterable<R extends JanusGraphRelation> implements 
         return new EdgeIterator();
     }
 
-
+    //边迭代器
     private class EdgeIterator implements Iterator<R> {
 
         private final Iterator<InternalVertex> vertexIterator;

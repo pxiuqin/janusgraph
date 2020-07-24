@@ -21,6 +21,7 @@ import org.janusgraph.graphdb.query.condition.Condition;
 import java.util.Collections;
 
 /**
+ * 关系类型的枚举
 * @author Matthias Broecheler (me@matthiasb.com)
 */
 public enum RelationCategory implements Condition<JanusGraphRelation> {
@@ -38,6 +39,7 @@ public enum RelationCategory implements Condition<JanusGraphRelation> {
         }
     }
 
+    //执行一个基于点查询
     public Iterable<JanusGraphRelation> executeQuery(JanusGraphVertexQuery query) {
         switch (this) {
             case EDGE: return (Iterable)query.edges();
@@ -71,6 +73,7 @@ public enum RelationCategory implements Condition<JanusGraphRelation> {
         return 0;
     }
 
+    //关系类型的逻辑条件运算【判断是什么类型】
     @Override
     public boolean evaluate(JanusGraphRelation relation) {
         switch(this) {

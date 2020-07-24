@@ -21,7 +21,7 @@ import org.apache.tinkerpop.gremlin.structure.Property;
 
 /**
  * JanusGraphElement represents the abstract concept of an entity in the graph and specifies basic methods for interacting
- * with entities.
+ * with entities.【点、边、属性全部需要实现的一些基本操作】
  * The two basic entities in a graph database are {@link JanusGraphRelation} and {@link JanusGraphVertex}.
  * Entities have a life cycle state which reflects the current state of the entity with respect
  * to the {@link JanusGraphTransaction} in which it occurs. An entity may be in any one of these states

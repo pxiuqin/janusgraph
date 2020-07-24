@@ -49,11 +49,12 @@ public class And<E extends JanusGraphElement> extends MultiCondition<E> {
         return Type.AND;
     }
 
+    //重点实现evaluate的计算
     @Override
     public boolean evaluate(E element) {
         for (Condition<E> condition : this) {
             if (!condition.evaluate(element))
-                return false;
+                return false;  //只要有一个条件为false就返回false
         }
 
         return true;

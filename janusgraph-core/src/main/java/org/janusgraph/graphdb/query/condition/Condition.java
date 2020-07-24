@@ -17,7 +17,7 @@ package org.janusgraph.graphdb.query.condition;
 import org.janusgraph.core.JanusGraphElement;
 
 /**
- * A logical condition which evaluates against a provided element to true or false.
+ * A logical condition which evaluates against a provided element to true or false.【逻辑表达式】
  * <p>
  * A condition can be nested to form complex logical expressions with AND, OR and NOT.
  * A condition is either a literal, a negation of a condition, or a logical combination of conditions (AND, OR).

@@ -73,7 +73,7 @@ import static org.janusgraph.graphdb.configuration.GraphDatabaseConfiguration.*;
 /**
  * Orchestrates and configures all backend systems:
  * The primary backend storage ({@link KeyColumnValueStore}) and all external indexing providers ({@link IndexProvider}).
- *
+ * 所有后端实现的存储系统都要实现如下相关存储结构
  * @author Matthias Broecheler (me@matthiasb.com)
  */
 
@@ -84,7 +84,7 @@ public class Backend implements LockerProvider, AutoCloseable {
     /**
      * These are the names for the edge store and property index databases, respectively.
      * The edge store contains all edges and properties. The property index contains an
-     * inverted index from attribute value to vertex.
+     * inverted index from attribute value to vertex.【倒排索引，从属性到节点】
      * <p>
      * These names are fixed and should NEVER be changed. Changing these strings can
      * disrupt storage adapters that rely on these names for specific configurations.
@@ -92,8 +92,8 @@ public class Backend implements LockerProvider, AutoCloseable {
      * but to clear the upgrade path from Titan to JanusGraph, we had to pull it into
      * configuration.
      */
-    public static final String EDGESTORE_NAME = "edgestore";
-    public static final String INDEXSTORE_NAME = "graphindex";
+    public static final String EDGESTORE_NAME = "edgestore";  //存储边和属性
+    public static final String INDEXSTORE_NAME = "graphindex";  //存储索引【倒排索引】
 
     public static final String METRICS_STOREMANAGER_NAME = "storeManager";
     public static final String METRICS_MERGED_STORE = "stores";
@@ -104,7 +104,7 @@ public class Backend implements LockerProvider, AutoCloseable {
     public static final String SYSTEM_TX_LOG_NAME = "txlog";
     public static final String SYSTEM_MGMT_LOG_NAME = "systemlog";
 
-    public static final double EDGESTORE_CACHE_PERCENT = 0.8;
+    public static final double EDGESTORE_CACHE_PERCENT = 0.8;  //边和属性缓存百分比
     public static final double INDEXSTORE_CACHE_PERCENT = 0.2;
 
     private static final long ETERNAL_CACHE_EXPIRATION = 1000L *3600*24*365*200; //200 years

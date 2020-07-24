@@ -127,7 +127,7 @@ public class StandardJanusGraph extends JanusGraphBlueprintsGraph {
     protected final Serializer serializer;
 
     //Caches
-    public final SliceQuery vertexExistenceQuery;
+    public final SliceQuery vertexExistenceQuery;  //节点
     private final RelationQueryCache queryCache;
     private final SchemaCache schemaCache;
 
@@ -147,6 +147,7 @@ public class StandardJanusGraph extends JanusGraphBlueprintsGraph {
 
     private final String name;
 
+    //构建标准图
     public StandardJanusGraph(GraphDatabaseConfiguration configuration) {
 
         this.config = configuration;
@@ -459,6 +460,7 @@ public class StandardJanusGraph extends JanusGraphBlueprintsGraph {
         return tx.edgeStoreQuery(new KeySliceQuery(idManager.getKey(vid), query));
     }
 
+    //
     public List<EntryList> edgeMultiQuery(LongArrayList vertexIdsAsLongs, SliceQuery query, BackendTransaction tx) {
         Preconditions.checkArgument(vertexIdsAsLongs != null && !vertexIdsAsLongs.isEmpty());
         final List<StaticBuffer> vertexIds = new ArrayList<>(vertexIdsAsLongs.size());

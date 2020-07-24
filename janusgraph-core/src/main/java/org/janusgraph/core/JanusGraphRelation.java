@@ -20,7 +20,7 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 /**
  * JanusGraphRelation is the most abstract form of a relation between a vertex and some other entity, where
- * relation is understood in its mathematical sense. It generalizes the notion of an edge and a property.
+ * relation is understood in its mathematical sense. It generalizes the notion of an edge and a property.【抽象的定义了Property和Edge的结合体】
  * <br>
  * A JanusGraphRelation extends {@link JanusGraphElement} which means it is an entity in its own right. This means, a JanusGraphRelation
  * can have properties and unidirectional edges connecting it to other vertices.

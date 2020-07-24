@@ -80,6 +80,8 @@ public class IndexRepairJob extends IndexUpdateJob implements VertexScanJob {
         Set<SchemaStatus> acceptableStatuses = SchemaAction.REINDEX.getApplicableStatus();
         boolean isValidIndex = true;
         String invalidIndexHint;
+
+        //判断相关索引类型
         if (index instanceof RelationTypeIndex ||
                 (index instanceof JanusGraphIndex && ((JanusGraphIndex)index).isCompositeIndex()) ) {
             SchemaStatus actualStatus = schemaVertex.getStatus();
@@ -204,11 +206,12 @@ public class IndexRepairJob extends IndexUpdateJob implements VertexScanJob {
         }
     }
 
+    //查询处理
     @Override
     public void getQueries(QueryContainer queries) {
         if (index instanceof RelationTypeIndex) {
             queries.addQuery().types(indexRelationTypeName).direction(Direction.OUT).relations();
-        } else if (index instanceof JanusGraphIndex) {
+        } else if (index instanceof JanusGraphIndex) {  //确定相关索引类型，进行不同查询
             IndexType indexType = managementSystem.getSchemaVertex(index).asIndexType();
             switch (indexType.getElement()) {
                 case PROPERTY:

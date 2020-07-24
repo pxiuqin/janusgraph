@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 /**
+ * 标准Scanner可以通过多线程来完成相关查询
  * @author Matthias Broecheler (me@matthiasb.com)
  */
 public class StandardScanner  {

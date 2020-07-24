@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 /**
- * A global computation over
+ * A global computation over【基础到Scan操作接口】
  *
  * @author Matthias Broecheler (me@matthiasb.com)
  */

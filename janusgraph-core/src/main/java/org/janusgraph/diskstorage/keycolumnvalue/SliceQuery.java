@@ -31,7 +31,7 @@ import java.util.Objects;
 
 /**
  * Queries for a slice of data identified by a start point (inclusive) and end point (exclusive).  【包含开始节点，不包含结束节点】
- * Returns all {@link StaticBuffer}s that lie in this range up to the given limit.
+ * Returns all {@link StaticBuffer}s that lie in this range up to the given limit.【片查询】
  * <p>
  * If a SliceQuery is marked <i>static</i> it is expected that the result set does not change.
  *

@@ -46,7 +46,7 @@ public interface VertexScanJob extends Cloneable {
     default void workerIterationEnd(ScanMetrics metrics) {}
 
     /**
-     * Process the given vertex with its adjacency list and properties pre-loaded.
+     * Process the given vertex with its adjacency list and properties pre-loaded.【给定点的邻接列表和相关属性，先预加载】
      *
      * @param vertex
      * @param metrics

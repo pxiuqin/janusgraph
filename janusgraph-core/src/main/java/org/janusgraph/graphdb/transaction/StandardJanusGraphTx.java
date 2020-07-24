@@ -407,14 +407,14 @@ public class StandardJanusGraphTx extends JanusGraphBlueprintsTransaction implem
             if (isValidVertexId(id)) {
                 if (idInspector.isPartitionedVertex(id)) id=idManager.getCanonicalVertexId(id);
                 if (vertexCache.contains(id))
-                    result.add(vertexCache.get(id, existingVertexRetriever));
+                    result.add(vertexCache.get(id, existingVertexRetriever));  //表示在cache中命中
                 else
                     vertexIds.add(id);
             }
         }
         if (!vertexIds.isEmpty()) {
             if (externalVertexRetriever.hasVerifyExistence()) {
-                List<EntryList> existence = graph.edgeMultiQuery(vertexIds,graph.vertexExistenceQuery,txHandle);
+                List<EntryList> existence = graph.edgeMultiQuery(vertexIds,graph.vertexExistenceQuery,txHandle);  //基于给定vID查询
                 for (int i = 0; i < vertexIds.size(); i++) {
                     if (!existence.get(i).isEmpty()) {
                         long id = vertexIds.get(i);

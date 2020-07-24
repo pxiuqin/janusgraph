@@ -1372,7 +1372,7 @@ public class GraphDatabaseConfiguration {
     public Backend getBackend() {
         Backend backend = new Backend(configuration);
         backend.initialize(configuration);
-        storeFeatures = backend.getStoreFeatures();
+        storeFeatures = backend.getStoreFeatures();  //设置存储后端特征
         return backend;
     }
 

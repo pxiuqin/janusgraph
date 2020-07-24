@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * 查询容器
  * @author Matthias Broecheler (me@matthiasb.com)
  */
 public class QueryContainer {

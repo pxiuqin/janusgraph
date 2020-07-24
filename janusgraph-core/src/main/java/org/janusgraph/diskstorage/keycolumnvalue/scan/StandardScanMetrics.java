@@ -23,12 +23,13 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
+ * 标准的Scan任务执行统计量
  * @author Matthias Broecheler (me@matthiasb.com)
  */
 public class StandardScanMetrics implements ScanMetrics {
 
     private final EnumMap<Metric,AtomicLong> metrics;
-    private final ConcurrentMap<String,AtomicLong> customMetrics;
+    private final ConcurrentMap<String,AtomicLong> customMetrics;  //可以自定义相关度量
 
     private static final Logger log =
             LoggerFactory.getLogger(StandardScanMetrics.class);
