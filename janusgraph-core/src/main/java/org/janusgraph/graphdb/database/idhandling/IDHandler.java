@@ -86,7 +86,7 @@ public class IDHandler {
 
         private static DirectionID getDirectionID(int relationType, int direction) {
             assert relationType >= 0 && relationType <= 1 && direction >= 0 && direction <= 1;
-            return forId((relationType << 1) + direction);
+            return forId((relationType << 1) + direction);  //高位表示类型，低位表示方向
         }
 
         private static DirectionID forId(int id) {

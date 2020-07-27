@@ -67,6 +67,7 @@ public class StandardScanner  {
         for (KeyColumnValueStore kcvs : openStores) kcvs.close();
     }
 
+    //如果是存储任务，查看当前状态
     private void addJob(Object jobId, StandardScannerExecutor executor) {
         for (Map.Entry<Object,StandardScannerExecutor> jobs : runningJobs.entrySet()) {
             StandardScannerExecutor exe = jobs.getValue();
@@ -197,14 +198,14 @@ public class StandardScanner  {
 //            }
 
             StoreTransaction storeTx = manager.beginTransaction(txBuilder.build());
-            KeyColumnValueStore kcvs = manager.openDatabase(dbName);
+            KeyColumnValueStore kcvs = manager.openDatabase(dbName);  //Backend store
 
             openStores.add(kcvs);
             try {
                 StandardScannerExecutor executor = new StandardScannerExecutor(job, finishJob, kcvs, storeTx,
-                        manager.getFeatures(), numProcessingThreads, workBlockSize, jobConfiguration, graphConfiguration);
+                        manager.getFeatures(), numProcessingThreads, workBlockSize, jobConfiguration, graphConfiguration); //构建一个标准的查询执行
                 addJob(jobId,executor);
-                new Thread(executor).start();
+                new Thread(executor).start();  //启动执行器
                 return executor;
             } catch (Throwable e) {
                 storeTx.rollback();

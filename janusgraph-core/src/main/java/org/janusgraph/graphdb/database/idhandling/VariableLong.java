@@ -22,6 +22,7 @@ import org.janusgraph.diskstorage.WriteBuffer;
 import org.janusgraph.diskstorage.util.WriteByteBuffer;
 
 /**
+ * 可变Long类型处理
  * @author Matthias Broecheler (me@matthiasb.com)
  */
 

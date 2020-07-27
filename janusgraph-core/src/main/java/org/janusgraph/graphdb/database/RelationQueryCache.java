@@ -75,7 +75,7 @@ public class RelationQueryCache implements AutoCloseable {
         private final SliceQuery both;
 
         public CacheEntry(EdgeSerializer edgeSerializer, InternalRelationType t) {
-            if (t.isPropertyKey()) {
+            if (t.isPropertyKey()) {  //如果是属性
                 out = edgeSerializer.getQuery(t, Direction.OUT,new EdgeSerializer.TypedInterval[t.getSortKey().length]);
                 in = out;
                 both = out;

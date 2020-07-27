@@ -103,19 +103,21 @@ public class EdgeSerializer implements RelationReader {
         Object other;
         int startKeyPos = in.getPosition();
         int endKeyPos = 0;
+
+        //判断是边的处理
         if (relationType.isEdgeLabel()) {
             long otherVertexId;
-            if (multiplicity.isConstrained()) {
-                if (multiplicity.isUnique(dir)) {
+            if (multiplicity.isConstrained()) {  //不是多重图
+                if (multiplicity.isUnique(dir)) { //单边
                     otherVertexId = VariableLong.readPositive(in);
-                } else {
+                } else { //多边
                     in.movePositionTo(data.getValuePosition());
                     otherVertexId = VariableLong.readPositiveBackward(in);
                     in.movePositionTo(data.getValuePosition());
                 }
                 relationId = VariableLong.readPositive(in);
             } else {
-                in.movePositionTo(data.getValuePosition());
+                in.movePositionTo(data.getValuePosition());   //位移动
 
                 relationId = VariableLong.readPositiveBackward(in);
                 otherVertexId = VariableLong.readPositiveBackward(in);
@@ -193,6 +195,7 @@ public class EdgeSerializer implements RelationReader {
         }
     }
 
+    //
     private Object readInline(ReadBuffer read, PropertyKey key, InlineType inlineType) {
         return readPropertyValue(read, key, inlineType);
     }
@@ -201,6 +204,7 @@ public class EdgeSerializer implements RelationReader {
         return readPropertyValue(read,key,InlineType.NORMAL);
     }
 
+    //
     private Object readPropertyValue(ReadBuffer read, PropertyKey key, InlineType inlineType) {
         if (InternalAttributeUtil.hasGenericDataType(key)) {
             return serializer.readClassAndObject(read);
@@ -252,12 +256,12 @@ public class EdgeSerializer implements RelationReader {
         DataOutput out = serializer.getDataOutput(DEFAULT_CAPACITY);  //按照实际serilizer序列化，默认是StandardSerializer
         int valuePosition;
         IDHandler.writeRelationType(out, typeId, dirID, type.isInvisibleType());   //写入边，这里会调用相关序列化实现
-        Multiplicity multiplicity = type.multiplicity();
+        Multiplicity multiplicity = type.multiplicity();  //类型情况
 
         long[] sortKey = type.getSortKey();
         assert !multiplicity.isConstrained() || sortKey.length==0: type.name();
         int keyStartPos = out.getPosition();
-        if (!multiplicity.isConstrained()) {
+        if (!multiplicity.isConstrained()) { //多重是处理，表示没有限制
             writeInlineTypes(sortKey, relation, out, tx, InlineType.KEY);
         }
         int keyEndPos = out.getPosition();
@@ -267,7 +271,7 @@ public class EdgeSerializer implements RelationReader {
         //How multiplicity is handled for edges and properties is slightly different
         if (relation.isEdge()) {
             long otherVertexId = relation.getVertex((position + 1) % 2).longId();
-            if (multiplicity.isConstrained()) {
+            if (multiplicity.isConstrained()) { //有约束的情况
                 if (multiplicity.isUnique(dir)) {
                     valuePosition = out.getPosition();
                     VariableLong.writePositive(out, otherVertexId);
@@ -289,17 +293,17 @@ public class EdgeSerializer implements RelationReader {
             PropertyKey key = (PropertyKey) type;
             assert key.dataType().isInstance(value);
 
-            if (multiplicity.isConstrained()) {
-                if (multiplicity.isUnique(dir)) { //Cardinality=SINGLE
-                    valuePosition = out.getPosition();
+            if (multiplicity.isConstrained()) { //
+                if (multiplicity.isUnique(dir)) { //Cardinality=SINGLE，单个值
+                    valuePosition = out.getPosition(); //先取位置
                     writePropertyValue(out,key,value);
-                } else { //Cardinality=SET
+                } else { //Cardinality=SET，集合写入
                     writePropertyValue(out,key,value);
-                    valuePosition = out.getPosition();
+                    valuePosition = out.getPosition();  //后取位置
                 }
                 VariableLong.writePositive(out, relationId);
             } else {
-                assert multiplicity.getCardinality()== Cardinality.LIST;
+                assert multiplicity.getCardinality()== Cardinality.LIST;  //不去重复list
                 VariableLong.writePositiveBackward(out, relationId);
                 valuePosition = out.getPosition();
                 writePropertyValue(out,key,value);
@@ -336,6 +340,7 @@ public class EdgeSerializer implements RelationReader {
                                     out.getStaticBuffer(), valuePosition);
     }
 
+    //
     private enum InlineType {
 
         KEY, SIGNATURE, NORMAL;
@@ -389,6 +394,7 @@ public class EdgeSerializer implements RelationReader {
         return new SliceQuery(bound[0], bound[1]);
     }
 
+    //基于关系类型查询
     public SliceQuery getQuery(InternalRelationType type, Direction dir, TypedInterval[] sortKey) {
         Preconditions.checkNotNull(type);
         Preconditions.checkNotNull(dir);
@@ -399,7 +405,7 @@ public class EdgeSerializer implements RelationReader {
         RelationCategory rt = type.isPropertyKey() ? RelationCategory.PROPERTY : RelationCategory.EDGE;
         if (dir == Direction.BOTH) {
             assert type.isEdgeLabel();
-            sliceStart = IDHandler.getRelationType(type.longId(), getDirID(Direction.OUT, rt), type.isInvisibleType());
+            sliceStart = IDHandler.getRelationType(type.longId(), getDirID(Direction.OUT, rt), type.isInvisibleType());  //分片开始
             sliceEnd = IDHandler.getRelationType(type.longId(), getDirID(Direction.IN, rt), type.isInvisibleType());
             assert sliceStart.compareTo(sliceEnd)<0;
             sliceEnd = BufferUtil.nextBiggerBuffer(sliceEnd);
