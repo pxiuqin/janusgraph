@@ -69,7 +69,7 @@ if [[ -z "$JANUSGRAPH_CP" ]];then
   JANUSGRAPH_CP="$JANUSGRAPH_CP":$(find -L $JANUSGRAPH_EXT -name '*.jar' | sort | tr '\n' ':')
 fi
 
-JANUSGRAPH_SERVER_CMD=org.apache.tinkerpop.gremlin.server.GremlinServer
+JANUSGRAPH_SERVER_CMD=org.janusgraph.graphdb.server.JanusGraphServer
 
 # (Cygwin only) Use ; classpath separator and reformat paths for Windows ("C:\foo")
 [[ $(uname) = CYGWIN* ]] && JANUSGRAPH_CP="$(cygpath -p -w "$JANUSGRAPH_CP")"
@@ -273,7 +273,7 @@ case "$1" in
     install "$@"
     ;;
   help|usage)
-    echo "Usage: $0 {start|stop|restart|status|install <group> <artifact> <version>|<conf file>}"
+    echo "Usage: $0 {start|stop|restart|status|install|usage <group> <artifact> <version>|<conf file>}"
     echo
     echo "    start        Start the server in the background using conf/gremlin-server/gremlin-server.yaml as the"
     echo "                 default configuration file"

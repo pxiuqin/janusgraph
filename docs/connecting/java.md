@@ -25,46 +25,51 @@ To get started with JanusGraph in Java:
 
 2.  Add dependencies on `janusgraph-driver` and `gremlin-driver` to the dependency manager:
 
-    ```xml tab='Maven'
-    <dependency>
-        <groupId>org.janusgraph</groupId>
-        <artifactId>janusgraph-driver</artifactId>
-        <version>{{ latest_version }}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.apache.tinkerpop</groupId>
-        <artifactId>gremlin-driver</artifactId>
-        <version>{{ tinkerpop_version }}</version>
-    </dependency>
-    ```
+    === "Maven"
+        ```xml
+        <dependency>
+            <groupId>org.janusgraph</groupId>
+            <artifactId>janusgraph-driver</artifactId>
+            <version>{{ latest_version }}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tinkerpop</groupId>
+            <artifactId>gremlin-driver</artifactId>
+            <version>{{ tinkerpop_version }}</version>
+        </dependency>
+        ```
 
-    ```groovy tab='Gradle'
-    compile "org.janusgraph:janusgraph-driver:{{ latest_version }}"
-    compile "org.apache.tinkerpop:gremlin-driver:{{ tinkerpop_version }}"
-    ```
+    === "Gradle"
+        ```groovy
+        compile "org.janusgraph:janusgraph-driver:{{ latest_version }}"
+        compile "org.apache.tinkerpop:gremlin-driver:{{ tinkerpop_version }}"
+        ```
 
 3.  Add two configuration files, `conf/remote-graph.properties` and
     `conf/remote-objects.yaml`:
 
-    ```properties tab='conf/remote-graph.properties'
-    gremlin.remote.remoteConnectionClass=org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection
-    gremlin.remote.driver.clusterFile=conf/remote-objects.yaml
-    gremlin.remote.driver.sourceName=g
-    ```
+    === "conf/remote-graph.properties"
+        ```conf
+        gremlin.remote.remoteConnectionClass=org.apache.tinkerpop.gremlin.driver.remote.DriverRemoteConnection
+        gremlin.remote.driver.clusterFile=conf/remote-objects.yaml
+        gremlin.remote.driver.sourceName=g
+        ```
 
-    ```yaml tab='conf/remote-objects.yaml'
-    hosts: [localhost]
-    port: 8182
-    serializer: { 
-        className: org.apache.tinkerpop.gremlin.driver.ser.GraphBinaryMessageSerializerV1,
-        config: { ioRegistries: [org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry] }}
-    ```
+    === "conf/remote-objects.yaml"
+        ```yaml
+        hosts: [localhost]
+        port: 8182
+        serializer: { 
+            className: org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV1d0,
+            config: { ioRegistries: [org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry] }}
+        ```
 
 4.  Create a `GraphTraversalSource` which is the basis for all Gremlin traversals:
 
     ```java
-    Graph graph = EmptyGraph.instance();
-    GraphTraversalSource g = graph.traversal().withRemote("conf/remote-graph.properties");
+    import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal;
+
+    GraphTraversalSource g = traversal().withRemote("conf/remote-graph.properties");
     // Reuse 'g' across the application
     // and close it on shut-down to close open connections with g.close()
     ```
